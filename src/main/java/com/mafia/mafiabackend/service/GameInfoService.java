@@ -16,7 +16,7 @@ public class GameInfoService {
         GameInfo gameInfo = gameInfoRepository.findOneByPlayerIdAndGameId(
                 gameInfoDtoRequest.getPlayerId(),
                 gameInfoDtoRequest.getId())
-                .orElseThrow();
+                .orElseThrow(RuntimeException::new);
         gameInfo.setFoul(gameInfoDtoRequest.getFouls());
         gameInfo.setAlive(gameInfoDtoRequest.getAlive());
         gameInfoRepository.save(gameInfo);
