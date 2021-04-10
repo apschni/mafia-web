@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 public class GameInfoService {
     private final GameInfoRepository gameInfoRepository;
 
-    public GameInfo updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
+    public void updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
         GameInfo gameInfo = gameInfoRepository.findOneByPlayerIdAndGameId(
                 gameInfoDtoRequest.getPlayerId(),
                 gameInfoDtoRequest.getId())
                 .orElseThrow(RuntimeException::new);
         gameInfo.setFoul(gameInfoDtoRequest.getFouls());
         gameInfo.setAlive(gameInfoDtoRequest.getAlive());
+        gameInfo.setPoints(gameInfoDtoRequest.getPoints());
         gameInfoRepository.save(gameInfo);
-        return gameInfo;
     }
 }
