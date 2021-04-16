@@ -25,5 +25,4 @@ public class GameController {
         return gameService.createGame(gameDtoRequest).getId().toString();
     }
 
-
 }

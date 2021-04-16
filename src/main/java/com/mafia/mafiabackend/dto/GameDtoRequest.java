@@ -11,6 +11,6 @@ import java.util.List;
 public class GameDtoRequest {
     @Schema(description = "Тип игры CLASSIC/KIEV")
     private GameType gameType;
-    @Schema(description = "Id всех игроков")
+    @Schema(description = "Список Id всех игроков")
     private List<Long> playersIds;
 }

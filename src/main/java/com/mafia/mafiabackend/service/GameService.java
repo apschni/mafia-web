@@ -53,6 +53,7 @@ public class GameService {
         return game;
     }
 
+
     private void randomizeRoles(GameDtoRequest gameDtoRequest, Map<Long, Role> playerIdToRole, List<Long> playersIds) {
         int counter = 0;
         if (gameDtoRequest.getGameType() == GameType.KIEV) {

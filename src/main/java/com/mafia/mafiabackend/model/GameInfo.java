@@ -1,30 +1,33 @@
 package com.mafia.mafiabackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.swagger.v3.oas.annotations.Hidden;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Hidden
 @Entity
 @Data
+@ToString(exclude = {"game", "player"})
+@EqualsAndHashCode(exclude = {"game", "player"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameInfo {
     @GeneratedValue
     @Id
-    private UUID id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "player_id")
+    @JsonBackReference
     private Player player;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "game_id")
+    @JsonBackReference
     private Game game;
 
     @Enumerated(EnumType.STRING)
