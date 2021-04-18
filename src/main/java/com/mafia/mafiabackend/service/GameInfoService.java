@@ -10,12 +10,24 @@ import com.mafia.mafiabackend.repository.GameInfoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class GameInfoService {
     private final GameInfoRepository gameInfoRepository;
+
+    public GameInfoDtoResponse getGameInfos(Long id){
+        List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
+        Set<GameInfo> targetSet = new HashSet<>(gameInfos);
+        return GameInfoDtoResponse.builder()
+                .gameInfos(targetSet)
+                .gameFinished(false)
+                .build();
+    }
 
     public GameInfoDtoResponse updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
         GameInfo gameInfo = gameInfoRepository.findOneByPlayerIdAndGameId(

@@ -6,6 +6,7 @@ import com.mafia.mafiabackend.service.GameInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,4 +25,10 @@ public class GameInfoController {
     public GameInfoDtoResponse changeGameInfo(@RequestBody GameInfoDtoRequest gameInfoDtoRequest) {
         return gameInfoService.updateGameInfo(gameInfoDtoRequest);
     }
+
+    @GetMapping("/gameInfo")
+    public GameInfoDtoResponse getGameInfos(@RequestBody Long id){
+        return gameInfoService.getGameInfos(id);
+    }
+
 }
