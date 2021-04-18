@@ -1,6 +1,7 @@
 package com.mafia.mafiabackend.service;
 
 import com.mafia.mafiabackend.dto.GameDtoRequest;
+import com.mafia.mafiabackend.dto.GameInfoDtoResponse;
 import com.mafia.mafiabackend.model.Game;
 import com.mafia.mafiabackend.model.GameInfo;
 import com.mafia.mafiabackend.model.GameType;
@@ -11,10 +12,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -22,6 +20,15 @@ public class GameService {
     private final GameRepository gameRepository;
     private final GameInfoRepository gameInfoRepository;
     private final PlayerRepository playerRepository;
+
+    public List<Long> getActiveGames(){
+        List<Game> games = gameRepository.findAllByRedWinIsNull();
+        List<Long> gameIds = new ArrayList<>();
+        for (Game game : games) {
+            gameIds.add(game.getId());
+        }
+        return gameIds;
+    }
 
     public Game createGame(GameDtoRequest gameDtoRequest) {
         Game game = Game.builder()
