@@ -32,7 +32,10 @@ public class GameService {
     }
 
     public Long finishGame(Long id, Boolean redWin){
-        Game game = gameRepository.findById(id).orElseThrow();
+        Game game = gameRepository.findById(id).orElse(null);
+        if (game == null){
+            return 4000004L; //KOSTYL
+        }
         game.setRedWin(redWin);
         game.setGameFinished(true);
         gameRepository.save(game);
