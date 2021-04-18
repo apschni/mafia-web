@@ -1,6 +1,9 @@
 package com.mafia.mafiabackend.controller;
 
 import com.mafia.mafiabackend.dto.GameDtoRequest;
+import com.mafia.mafiabackend.dto.GameReshuffleDtoRequest;
+import com.mafia.mafiabackend.model.Game;
+import com.mafia.mafiabackend.model.GameType;
 import com.mafia.mafiabackend.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,20 +27,35 @@ public class GameController {
             description = "Позволяет создать игру и автоматически распределяет роли"
     )
     @PostMapping("/game")
-    public String createGame(@RequestBody GameDtoRequest gameDtoRequest) {
-        return gameService.createGame(gameDtoRequest).getId().toString();
+    public Long createGame(@RequestBody GameDtoRequest gameDtoRequest) {
+        return gameService.createGame(gameDtoRequest);
+    }
+
+    @Operation(
+            summary = "Помечает игру с данным id как завершенную"
+    )
+    @PostMapping("game/finish")
+    public Long finishGame(@RequestBody Long id) {
+        return gameService.finishGame(id, true);
+    }
+
+    @Operation(
+            summary = "Тасует роли заново для игры с данным id и типом"
+    )
+    @PostMapping("/game/reshuffle")
+    public Long reshuffleRoles(@RequestBody GameReshuffleDtoRequest gameReshuffleDtoRequest) {
+        return gameService.reshuffleRoles(gameReshuffleDtoRequest.getId(), gameReshuffleDtoRequest.getGameType());
     }
 
     @Operation(
             summary = "Получение списка Id всех активных игр"
     )
     @GetMapping("/game/active")
-    public List<Long> getActiveGames(){
+    public List<Long> getActiveGames() {
         return gameService.getActiveGames();
     }
 
 
+    // TODO ручка по game id получает список живых игроков и их состояние
 
-    //TODO ручка возвращает активные игры(возвращает game id у активной игры)
-    // ,ручка по game id получает список живых игроков и их состояние
 }

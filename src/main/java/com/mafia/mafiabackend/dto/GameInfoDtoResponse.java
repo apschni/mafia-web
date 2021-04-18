@@ -13,6 +13,9 @@ import java.util.Set;
 public class GameInfoDtoResponse {
     @Schema(description = "Set всех GameInfo принадлежащих данной игре")
     private Set<GameInfo> gameInfos;
+
+    private GameInfo gameInfo;
+
     @Schema(description = "Индикатор, показывающий, закончена ли игра (если count(черных) == count(белых)")
     private Boolean gameFinished;
 }

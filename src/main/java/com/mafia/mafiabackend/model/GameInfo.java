@@ -2,6 +2,7 @@ package com.mafia.mafiabackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
@@ -17,15 +18,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class GameInfo {
     @GeneratedValue
+    @JsonIgnore
     @Id
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id")
     @JsonBackReference
     private Player player;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
     @JsonBackReference
     private Game game;
@@ -40,5 +42,13 @@ public class GameInfo {
     private Boolean alive;
 
     private Integer foul;
+
+    @JsonIgnore
+    @Column(name = "game_id", insertable = false, updatable = false)
+    private Long gameId;
+
+    @Column(name = "player_id", insertable = false, updatable = false)
+    private Long playerId;
+
 }
 

@@ -28,6 +28,8 @@ public class Game {
 
     private Boolean redWin;
 
+    private Boolean gameFinished;
+
     private Integer numberOfPlayers;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)

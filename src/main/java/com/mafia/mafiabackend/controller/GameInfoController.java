@@ -6,10 +6,7 @@ import com.mafia.mafiabackend.service.GameInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,9 +23,13 @@ public class GameInfoController {
         return gameInfoService.updateGameInfo(gameInfoDtoRequest);
     }
 
+    @Operation(
+            summary = "По id игры получает список всех gameInfos (состояний игроков сейчас)"
+    )
     @GetMapping("/gameInfo")
     public GameInfoDtoResponse getGameInfos(@RequestBody Long id){
         return gameInfoService.getGameInfos(id);
     }
+
 
 }

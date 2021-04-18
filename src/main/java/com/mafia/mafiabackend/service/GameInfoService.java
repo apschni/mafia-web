@@ -10,7 +10,6 @@ import com.mafia.mafiabackend.repository.GameInfoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class GameInfoService {
     private final GameInfoRepository gameInfoRepository;
+    private final GameService gameService;
 
     public GameInfoDtoResponse getGameInfos(Long id){
         List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
@@ -40,14 +40,31 @@ public class GameInfoService {
             gameInfo.setPoints(gameInfoDtoRequest.getPoints());
         }
         gameInfoRepository.save(gameInfo);
+
         Game game = gameInfo.getGame();
+        if (isGameFinishedByBlack(game)){
+            gameService.finishGame(game.getId(), false);
+        }
+        if (isGameFinishedByRed(game)) {
+            gameService.finishGame(game.getId(), true);
+        }
+
         return GameInfoDtoResponse.builder()
-                .gameInfos(game.getGameInfos())
-                .gameFinished(isGameFinished(game))
+//                .gameInfos(game.getGameInfos())
+                .gameInfo(gameInfo)
+                .gameFinished(isGameFinishedByBlack(game))
                 .build();
     }
 
-    private boolean isGameFinished(Game game) {
+    private boolean isGameFinishedByRed(Game game){
+        Set<GameInfo> gameInfos = game.getGameInfos();
+        long numberOfAliveBlackPlayers = gameInfos.stream()
+                .filter(x -> Role.isBlack(x.getRole()) && x.getAlive())
+                .count();
+        return numberOfAliveBlackPlayers == 0;
+    }
+
+    private boolean isGameFinishedByBlack(Game game) {
         Set<GameInfo> gameInfos = game.getGameInfos();
         long numberOfAliveBlackPlayers = gameInfos.stream()
                 .filter(x -> Role.isBlack(x.getRole()) && x.getAlive())
