@@ -1,9 +1,8 @@
 package com.mafia.mafiabackend.controller;
 
 import com.mafia.mafiabackend.dto.GameDtoRequest;
+import com.mafia.mafiabackend.dto.GameFinishDtoRequest;
 import com.mafia.mafiabackend.dto.GameReshuffleDtoRequest;
-import com.mafia.mafiabackend.model.Game;
-import com.mafia.mafiabackend.model.GameType;
 import com.mafia.mafiabackend.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +34,8 @@ public class GameController {
             summary = "Помечает игру с данным id как завершенную"
     )
     @PostMapping("game/finish")
-    public Long finishGame(@RequestBody Long id) {
-        return gameService.finishGame(id, true);
+    public Long finishGame(@RequestBody GameFinishDtoRequest gameFinishDtoRequest) {
+        return gameService.finishGame(gameFinishDtoRequest);
     }
 
     @Operation(
@@ -54,8 +53,5 @@ public class GameController {
     public List<Long> getActiveGames() {
         return gameService.getActiveGames();
     }
-
-
-    // TODO ручка по game id получает список живых игроков и их состояние
 
 }

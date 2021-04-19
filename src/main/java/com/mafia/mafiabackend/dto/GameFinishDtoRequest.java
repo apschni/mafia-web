@@ -1,9 +1,11 @@
 package com.mafia.mafiabackend.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Schema(description = "Сущность содержащая Id игры и параметр redWin")
 public class GameFinishDtoRequest {
     @Schema(description = "Id игры")

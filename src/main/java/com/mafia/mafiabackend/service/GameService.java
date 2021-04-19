@@ -1,6 +1,7 @@
 package com.mafia.mafiabackend.service;
 
 import com.mafia.mafiabackend.dto.GameDtoRequest;
+import com.mafia.mafiabackend.dto.GameFinishDtoRequest;
 import com.mafia.mafiabackend.model.*;
 import com.mafia.mafiabackend.repository.GameInfoRepository;
 import com.mafia.mafiabackend.repository.GameRepository;
@@ -22,7 +23,7 @@ public class GameService {
     private final GameInfoRepository gameInfoRepository;
     private final PlayerRepository playerRepository;
 
-    public List<Long> getActiveGames(){
+    public List<Long> getActiveGames() {
         List<Game> games = gameRepository.findAllByGameFinishedFalse();
         List<Long> gameIds = new ArrayList<>();
         for (Game game : games) {
@@ -31,12 +32,12 @@ public class GameService {
         return gameIds;
     }
 
-    public Long finishGame(Long id, Boolean redWin){
-        Game game = gameRepository.findById(id).orElse(null);
-        if (game == null){
+    public Long finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
+        Game game = gameRepository.findById(gameFinishDtoRequest.getId()).orElse(null);
+        if (game == null) {
             return 4000004L; //KOSTYL
         }
-        game.setRedWin(redWin);
+        game.setRedWin(gameFinishDtoRequest.getRedWin());
         game.setGameFinished(true);
         gameRepository.save(game);
         return game.getId();
@@ -79,7 +80,7 @@ public class GameService {
     }
 
 
-    public Long reshuffleRoles(Long id, GameType gameType){
+    public Long reshuffleRoles(Long id, GameType gameType) {
         List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
         List<Long> playerIds = gameInfos.stream()
                 .map(GameInfo::getPlayerId)

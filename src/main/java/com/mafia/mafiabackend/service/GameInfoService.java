@@ -1,6 +1,7 @@
 package com.mafia.mafiabackend.service;
 
 
+import com.mafia.mafiabackend.dto.GameFinishDtoRequest;
 import com.mafia.mafiabackend.dto.GameInfoDtoRequest;
 import com.mafia.mafiabackend.dto.GameInfoDtoResponse;
 import com.mafia.mafiabackend.model.Game;
@@ -20,7 +21,7 @@ public class GameInfoService {
     private final GameInfoRepository gameInfoRepository;
     private final GameService gameService;
 
-    public GameInfoDtoResponse getGameInfos(Long id){
+    public GameInfoDtoResponse getGameInfos(Long id) {
         List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
         Set<GameInfo> targetSet = new HashSet<>(gameInfos);
         return GameInfoDtoResponse.builder()
@@ -36,17 +37,23 @@ public class GameInfoService {
                 .orElseThrow(RuntimeException::new);
         gameInfo.setFoul(gameInfoDtoRequest.getFouls());
         gameInfo.setAlive(gameInfoDtoRequest.getAlive());
-        if (gameInfoDtoRequest.getPoints() != null){
+        if (gameInfoDtoRequest.getPoints() != null) {
             gameInfo.setPoints(gameInfoDtoRequest.getPoints());
         }
         gameInfoRepository.save(gameInfo);
 
         Game game = gameInfo.getGame();
-        if (isGameFinishedByBlack(game)){
-            gameService.finishGame(game.getId(), false);
+        if (isGameFinishedByBlack(game)) {
+            gameService.finishGame(GameFinishDtoRequest.builder()
+                    .id(game.getId())
+                    .redWin(false)
+                    .build());
         }
         if (isGameFinishedByRed(game)) {
-            gameService.finishGame(game.getId(), true);
+            gameService.finishGame(GameFinishDtoRequest.builder()
+                    .id(game.getId())
+                    .redWin(false)
+                    .build());
         }
 
         return GameInfoDtoResponse.builder()
@@ -56,7 +63,7 @@ public class GameInfoService {
                 .build();
     }
 
-    private boolean isGameFinishedByRed(Game game){
+    private boolean isGameFinishedByRed(Game game) {
         Set<GameInfo> gameInfos = game.getGameInfos();
         long numberOfAliveBlackPlayers = gameInfos.stream()
                 .filter(x -> Role.isBlack(x.getRole()) && x.getAlive())
