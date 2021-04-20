@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "GameInfo Controller", description = "Управление сущностями GameInfo")
 public class GameInfoController {
