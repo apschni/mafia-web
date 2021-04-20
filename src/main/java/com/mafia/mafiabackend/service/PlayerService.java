@@ -7,6 +7,7 @@ import com.mafia.mafiabackend.model.Player;
 import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,12 @@ public class PlayerService {
                         .build())
                 .collect(Collectors.toList());
 
+    }
+
+    public void deletePlayerById(Long id){
+        if (playerRepository.existsById(id)) {
+            playerRepository.deleteById(id);
+        }
     }
 
     public PlayerDtoResponse getPlayerById(Long id) {

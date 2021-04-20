@@ -41,4 +41,12 @@ public class PlayerController {
     public PlayerDtoResponse getPlayerById(@PathVariable("id") Long id) {
         return playerService.getPlayerById(id);
     }
+
+    @Operation(
+            summary = "Удаляет игрока по его id"
+    )
+    @DeleteMapping("/player/{id}")
+    public void deletePlayerById(@PathVariable("id") Long id){
+        playerService.deletePlayerById(id);
+    }
 }
