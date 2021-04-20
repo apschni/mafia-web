@@ -1,5 +1,6 @@
 package com.mafia.mafiabackend.controller;
 
+import com.mafia.mafiabackend.dto.PlayerDtoRequest;
 import com.mafia.mafiabackend.dto.PlayerDtoResponse;
 import com.mafia.mafiabackend.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,8 +22,8 @@ public class PlayerController {
             summary = "Добавление нового игрока"
     )
     @PostMapping("/player")
-    public Long addPlayer(@RequestBody String name) {
-        return playerService.addPlayer(name);
+    public Long addPlayer(@RequestBody PlayerDtoRequest playerDtoRequest) {
+        return playerService.addPlayer(playerDtoRequest);
     }
 
     @Operation(

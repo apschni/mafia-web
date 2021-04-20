@@ -1,6 +1,7 @@
 package com.mafia.mafiabackend.service;
 
 
+import com.mafia.mafiabackend.dto.PlayerDtoRequest;
 import com.mafia.mafiabackend.dto.PlayerDtoResponse;
 import com.mafia.mafiabackend.model.Player;
 import com.mafia.mafiabackend.repository.PlayerRepository;
@@ -16,9 +17,9 @@ public class PlayerService {
 
     private final PlayerRepository playerRepository;
 
-    public Long addPlayer(String name) {
+    public Long addPlayer(PlayerDtoRequest playerDtoRequest) {
         Player player = Player.builder()
-                .name(name).build();
+                .name(playerDtoRequest.getName()).build();
         playerRepository.save(player);
         return player.getId();
     }
