@@ -27,7 +27,7 @@ public class GameInfoController {
             summary = "По id игры получает список всех gameInfos (состояний игроков сейчас)"
     )
     @GetMapping("/gameInfo")
-    public GameInfoDtoResponse getGameInfos(@RequestBody Long id){
+    public GameInfoDtoResponse getGameInfos(@RequestBody Long id) {
         return gameInfoService.getGameInfos(id);
     }
 
