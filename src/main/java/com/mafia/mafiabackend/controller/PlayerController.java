@@ -12,6 +12,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "Player Controller", description = "Управление сущностями Player")
 public class PlayerController {
