@@ -1,7 +1,7 @@
 package com.mafia.mafiabackend.model;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Hidden
 @Entity
@@ -33,7 +33,7 @@ public class Game {
     private Integer numberOfPlayers;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private Set<GameInfo> gameInfos;
+    @JsonIgnore
+    private List<GameInfo> gameInfos;
 
 }

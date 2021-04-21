@@ -31,7 +31,7 @@ public class GameInfoService {
     }
 
     public GameInfoDtoResponse updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
-        GameInfo gameInfo = gameInfoRepository.findOneByPlayerIdAndGameId(
+        GameInfo gameInfo = gameInfoRepository.findByPlayerIdAndGameId(
                 gameInfoDtoRequest.getPlayerId(),
                 gameInfoDtoRequest.getId())
                 .orElseThrow(RuntimeException::new);
@@ -64,7 +64,7 @@ public class GameInfoService {
     }
 
     private boolean isGameFinishedByRed(Game game) {
-        Set<GameInfo> gameInfos = game.getGameInfos();
+        List<GameInfo> gameInfos = game.getGameInfos();
         long numberOfAliveBlackPlayers = gameInfos.stream()
                 .filter(x -> Role.isBlack(x.getRole()) && x.getAlive())
                 .count();
@@ -72,7 +72,7 @@ public class GameInfoService {
     }
 
     private boolean isGameFinishedByBlack(Game game) {
-        Set<GameInfo> gameInfos = game.getGameInfos();
+        List<GameInfo> gameInfos = game.getGameInfos();
         long numberOfAliveBlackPlayers = gameInfos.stream()
                 .filter(x -> Role.isBlack(x.getRole()) && x.getAlive())
                 .count();

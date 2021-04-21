@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Hidden
 @Entity
@@ -28,5 +28,5 @@ public class Player {
 
     @OneToMany(mappedBy = "player", fetch = FetchType.LAZY)
     @JsonManagedReference
-    private Set<GameInfo> gameInfos;
+    private List<GameInfo> gameInfos;
 }

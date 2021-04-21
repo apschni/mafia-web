@@ -35,7 +35,7 @@ public class GameService {
     public Long finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
         Game game = gameRepository.findById(gameFinishDtoRequest.getId()).orElse(null);
         if (game == null) {
-            return 4000004L; //KOSTYL
+            return null; //KOSTYL
         }
         game.setRedWin(gameFinishDtoRequest.getRedWin());
         game.setGameFinished(true);
