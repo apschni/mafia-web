@@ -19,11 +19,16 @@ public class StatisticsService {
 
     public StatisticsDtoResponse getStatisticsByPlayerId(Long id) {
         Player player = playerRepository.findById(id).orElse(null);
+
         if (player == null) {
             return null;
         }
-        List<GameInfo> gameInfos = player.getGameInfos();
-        if (gameInfos.isEmpty()){
+
+        List<GameInfo> gameInfos = player.getGameInfos().stream()
+                .filter(gameInfo -> gameInfo.getGame().getGameFinished())
+                .collect(Collectors.toList());
+
+        if (gameInfos.isEmpty()) {
             return null;
         }
         List<Game> games = gameInfos.stream().map(GameInfo::getGame).collect(Collectors.toList());
@@ -46,13 +51,11 @@ public class StatisticsService {
         int counterBlack = 0;
 
         for (GameInfo gameInfo : gameInfos) {
-            if (gameInfo.getGame().getGameFinished()) {
-                if (isRed && !Role.isBlack(gameInfo.getRole()) && gameInfo.getGame().getRedWin()) {
-                    counterRed++;
-                }
-                if (!isRed && Role.isBlack(gameInfo.getRole()) && !gameInfo.getGame().getRedWin()) {
-                    counterBlack++;
-                }
+            if (isRed && !Role.isBlack(gameInfo.getRole()) && gameInfo.getGame().getRedWin()) {
+                counterRed++;
+            }
+            if (!isRed && Role.isBlack(gameInfo.getRole()) && !gameInfo.getGame().getRedWin()) {
+                counterBlack++;
             }
         }
         return isRed ? counterRed : counterBlack;
@@ -65,9 +68,7 @@ public class StatisticsService {
     private Integer getPointsCount(List<GameInfo> gameInfos) {
         Integer counter = 0;
         for (GameInfo gameInfo : gameInfos) {
-            if (gameInfo.getGame().getGameFinished()) {
-                counter += gameInfo.getPoints();
-            }
+            counter += gameInfo.getPoints();
         }
         return counter;
     }
@@ -75,9 +76,7 @@ public class StatisticsService {
     private Integer getAverageFouls(List<GameInfo> gameInfos) {
         Integer counter = 0;
         for (GameInfo gameInfo : gameInfos) {
-            if (gameInfo.getGame().getGameFinished()) {
-                counter += gameInfo.getFoul();
-            }
+            counter += gameInfo.getFoul();
         }
         return counter / gameInfos.size();
     }
@@ -85,7 +84,7 @@ public class StatisticsService {
     private Integer getDeathCount(List<GameInfo> gameInfos) {
         Integer counter = 0;
         for (GameInfo gameInfo : gameInfos) {
-            if (gameInfo.getGame().getGameFinished() && !gameInfo.getAlive()) {
+            if (!gameInfo.getAlive()) {
                 counter++;
             }
         }

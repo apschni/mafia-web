@@ -46,13 +46,13 @@ public class GameInfoService {
         if (isGameFinishedByBlack(game)) {
             gameService.finishGame(GameFinishDtoRequest.builder()
                     .id(game.getId())
-                    .redWin(false)
+                    .redWin(0)
                     .build());
         }
         if (isGameFinishedByRed(game)) {
             gameService.finishGame(GameFinishDtoRequest.builder()
                     .id(game.getId())
-                    .redWin(false)
+                    .redWin(1)
                     .build());
         }
 

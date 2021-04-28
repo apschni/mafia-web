@@ -6,6 +6,7 @@ import com.mafia.mafiabackend.dto.PlayerDtoResponse;
 import com.mafia.mafiabackend.model.Player;
 import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,14 +14,16 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
 
-    public Long addPlayer(PlayerDtoRequest playerDtoRequest) {
+    public Long addPlayer(String name) {
         Player player = Player.builder()
-                .name(playerDtoRequest.getName()).build();
+                .name(name).build();
         playerRepository.save(player);
+        log.info("Created player: " + player.toString());
         return player.getId();
     }
 
@@ -37,6 +40,11 @@ public class PlayerService {
     public void deletePlayerById(Long id){
         if (playerRepository.existsById(id)) {
             playerRepository.deleteById(id);
+            log.info("Deleted player with id: " + id);
+        }else {
+            log.error("Failed to delete player with id: "
+                    + id
+                    + String.format(" (no such player in database with id: %d)", id));
         }
     }
 

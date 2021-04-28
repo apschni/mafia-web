@@ -10,6 +10,7 @@ import lombok.Data;
 public class GameFinishDtoRequest {
     @Schema(description = "Id игры")
     private Long id;
-    @Schema(description = "Boolean параметр redWin")
-    private Boolean redWin;
+    @Schema(description = "Параметр на завершение игры: если выиграли красные: 1, " +
+            "черные: 0, скип игры и удаление из базы: 2")
+    private Integer redWin;
 }
