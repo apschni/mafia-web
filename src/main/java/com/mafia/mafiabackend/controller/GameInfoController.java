@@ -8,9 +8,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "GameInfo Controller", description = "Управление сущностями GameInfo")
+@Tag(name = "GameInfo Controller", description = "Управление записями о состоянии игроков в игре," +
+        " получение всех состояний игроков для данной игры," +
+        " обновление информации о состоянии игроков")
 public class GameInfoController {
 
     private final GameInfoService gameInfoService;
@@ -19,7 +24,7 @@ public class GameInfoController {
             summary = "Обновление информации о фолах, очках и смерти игрока в базе"
     )
     @PatchMapping("/gameInfo")
-    public GameInfoDtoResponse changeGameInfo(@RequestBody GameInfoDtoRequest gameInfoDtoRequest) {
+    public GameInfoDtoResponse changeGameInfo(@RequestBody @Valid GameInfoDtoRequest gameInfoDtoRequest) {
         return gameInfoService.updateGameInfo(gameInfoDtoRequest);
     }
 
@@ -27,7 +32,7 @@ public class GameInfoController {
             summary = "По id игры получает список всех gameInfos (состояний игроков сейчас)"
     )
     @GetMapping("/gameInfo/{id}")
-    public GameInfoDtoResponse getGameInfos(@PathVariable("id") Long id) {
+    public GameInfoDtoResponse getGameInfos(@PathVariable("id") @NotNull Long id) {
         return gameInfoService.getGameInfos(id);
     }
 

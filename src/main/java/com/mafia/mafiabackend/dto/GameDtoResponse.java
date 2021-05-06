@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-@Schema(description = "")
+@Schema(hidden = true)
 public class GameDtoResponse {
 
     private Long id;

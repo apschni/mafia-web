@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Game Controller", description = "Управление сущностями Game")
+@Tag(name = "Game Controller",
+        description = "Управление играми, создание, завершение, перетасовка ролей и получение списка активных игр")
 public class GameController {
 
     private final GameService gameService;
@@ -34,10 +34,10 @@ public class GameController {
     }
 
     @Operation(
-            summary = "Помечает игру с данным id как завершенную"
+            summary = "Помечает игру с данным id как завершенную с данным исходом"
     )
     @PostMapping("game/finish")
-    public Long finishGame(@RequestBody GameFinishDtoRequest gameFinishDtoRequest) {
+    public Long finishGame(@RequestBody @Valid GameFinishDtoRequest gameFinishDtoRequest) {
         return gameService.finishGame(gameFinishDtoRequest);
     }
 
@@ -45,12 +45,12 @@ public class GameController {
             summary = "Тасует роли заново для игры с данным id и типом"
     )
     @PostMapping("/game/reshuffle")
-    public Long reshuffleRoles(@RequestBody GameReshuffleDtoRequest gameReshuffleDtoRequest) {
+    public Long reshuffleRoles(@RequestBody @Valid GameReshuffleDtoRequest gameReshuffleDtoRequest) {
         return gameService.reshuffleRoles(gameReshuffleDtoRequest.getId(), gameReshuffleDtoRequest.getGameType());
     }
 
     @Operation(
-            summary = "Получение списка Id всех активных игр"
+            summary = "Получение списка id всех активных игр"
     )
     @GetMapping("/game/active")
     public List<Long> getActiveGames() {

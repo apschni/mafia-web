@@ -4,11 +4,12 @@ package com.mafia.mafiabackend.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
 
-@Hidden
+@Schema(hidden = true)
 @Entity
 @Data
 @ToString(exclude = {"game", "player"})
