@@ -1,5 +1,6 @@
 package com.mafia.mafiabackend.dto;
 
+import com.mafia.mafiabackend.validation.PlayerExists;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ public class GameInfoDtoRequest {
     @Schema(description = "Id игры")
     private Long id;
     @Schema(description = "Id игрока")
+    @PlayerExists
     private Long playerId;
     @Schema(description = "Количество фолов")
     private Integer fouls;
