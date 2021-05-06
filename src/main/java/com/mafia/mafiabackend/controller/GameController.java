@@ -7,11 +7,14 @@ import com.mafia.mafiabackend.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,8 +29,8 @@ public class GameController {
             description = "Позволяет создать игру и автоматически распределяет роли"
     )
     @PostMapping("/game")
-    public Long createGame(@RequestBody GameDtoRequest gameDtoRequest) {
-        return gameService.createGame(gameDtoRequest);
+    public ResponseEntity<Long> createGame(@RequestBody @Valid GameDtoRequest gameDtoRequest) {
+        return ResponseEntity.ok(gameService.createGame(gameDtoRequest));
     }
 
     @Operation(

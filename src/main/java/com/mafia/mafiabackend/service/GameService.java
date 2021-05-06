@@ -44,14 +44,14 @@ public class GameService {
             return null;
         }
 
-        if (gameFinishDtoRequest.getRedWin() == 2){
+        if (gameFinishDtoRequest.getResult() == GameResult.SKIP_AND_DELETE){
             gameInfoRepository.deleteAll(game.getGameInfos());
             gameRepository.deleteById(gameFinishDtoRequest.getId());
             log.info("Game with id: " + gameFinishDtoRequest.getId() + " has been deleted from database");
             return gameFinishDtoRequest.getId();
         }
 
-        game.setRedWin(gameFinishDtoRequest.getRedWin() != 0);
+        game.setRedWin(gameFinishDtoRequest.getResult() == GameResult.RED_WIN);
         game.setGameFinished(true);
         gameRepository.save(game);
         log.info("Game with id: " + gameFinishDtoRequest.getId() + " has been finished");

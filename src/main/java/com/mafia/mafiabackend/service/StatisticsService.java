@@ -1,5 +1,6 @@
 package com.mafia.mafiabackend.service;
 
+import com.mafia.mafiabackend.dto.GameDtoResponse;
 import com.mafia.mafiabackend.dto.StatisticsDtoResponse;
 import com.mafia.mafiabackend.model.Game;
 import com.mafia.mafiabackend.model.GameInfo;
@@ -9,7 +10,9 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,63 +34,68 @@ public class StatisticsService {
         if (gameInfos.isEmpty()) {
             return null;
         }
-        List<Game> games = gameInfos.stream().map(GameInfo::getGame).collect(Collectors.toList());
+        List<Game> games = gameInfos.stream()
+                .map(GameInfo::getGame)
+                .collect(Collectors.toList());
+
+        List<GameDtoResponse> gameDtoResponses = new ArrayList<>();
+        games.forEach(game -> gameDtoResponses.add(GameDtoResponse.builder()
+                .gameFinished(game.getGameFinished())
+                .gameType(game.getGameType())
+                .id(game.getId())
+                .playerWins(isPlayerWon(game, player.getId()))
+                .build()));
 
         return StatisticsDtoResponse.builder()
                 .name(player.getName())
-                .games(games)
+                .games(gameDtoResponses)
                 .points(getPointsCount(gameInfos))
                 .winRate(getWinRate(gameInfos))
                 .averageFouls(getAverageFouls(gameInfos))
                 .deathCount(getDeathCount(gameInfos))
-                .winsByRed(getWinsBy(true, gameInfos))
-                .winsByBlack(getWinsBy(false, gameInfos))
+                .winsByRed(getWinsByRole(true, gameInfos))
+                .winsByBlack(getWinsByRole(false, gameInfos))
                 .totalGames(gameInfos.size())
                 .build();
     }
 
-    private Integer getWinsBy(Boolean isRed, List<GameInfo> gameInfos) {
-        int counterRed = 0;
-        int counterBlack = 0;
 
-        for (GameInfo gameInfo : gameInfos) {
-            if (isRed && !Role.isBlack(gameInfo.getRole()) && gameInfo.getGame().getRedWin()) {
-                counterRed++;
-            }
-            if (!isRed && Role.isBlack(gameInfo.getRole()) && !gameInfo.getGame().getRedWin()) {
-                counterBlack++;
-            }
-        }
-        return isRed ? counterRed : counterBlack;
+    private Boolean isPlayerWon(Game game, Long playerId) {
+        return game.getGameInfos().stream()
+                .filter(gameInfo -> gameInfo.getPlayerId().equals(playerId))
+                .map(GameInfo::getRole)
+                .anyMatch(role -> !Role.isBlack(role) == game.getRedWin());
     }
 
-    private Integer getWinRate(List<GameInfo> gameInfos) {
-        return (getWinsBy(true, gameInfos) + getWinsBy(false, gameInfos)) / gameInfos.size();
+    private Long getWinsByRole(Boolean isRed, List<GameInfo> gameInfos) {
+        return isRed ? gameInfos.stream()
+                .filter(gameInfo -> !Role.isBlack(gameInfo.getRole()) && gameInfo.getGame().getRedWin())
+                .count() : gameInfos.stream()
+                .filter(gameInfo -> Role.isBlack(gameInfo.getRole()) && !gameInfo.getGame().getRedWin())
+                .count();
+
     }
 
-    private Integer getPointsCount(List<GameInfo> gameInfos) {
-        Integer counter = 0;
-        for (GameInfo gameInfo : gameInfos) {
-            counter += gameInfo.getPoints();
-        }
-        return counter;
+    private Long getWinRate(List<GameInfo> gameInfos) {
+        return (getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos)) / gameInfos.size();
     }
 
-    private Integer getAverageFouls(List<GameInfo> gameInfos) {
-        Integer counter = 0;
-        for (GameInfo gameInfo : gameInfos) {
-            counter += gameInfo.getFoul();
-        }
-        return counter / gameInfos.size();
+    private Long getPointsCount(List<GameInfo> gameInfos) {
+        return gameInfos.stream()
+                .mapToLong(GameInfo::getPoints)
+                .sum();
     }
 
-    private Integer getDeathCount(List<GameInfo> gameInfos) {
-        Integer counter = 0;
-        for (GameInfo gameInfo : gameInfos) {
-            if (!gameInfo.getAlive()) {
-                counter++;
-            }
-        }
-        return counter;
+    private Double getAverageFouls(List<GameInfo> gameInfos) {
+        OptionalDouble average = gameInfos.stream()
+                .mapToInt(GameInfo::getFoul)
+                .average();
+        return average.isPresent() ? average.getAsDouble() : 0;
+    }
+
+    private Long getDeathCount(List<GameInfo> gameInfos) {
+        return gameInfos.stream()
+                .filter(gameInfo -> !gameInfo.getAlive())
+                .count();
     }
 }

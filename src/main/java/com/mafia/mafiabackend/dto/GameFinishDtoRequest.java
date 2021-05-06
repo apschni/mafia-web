@@ -1,5 +1,6 @@
 package com.mafia.mafiabackend.dto;
 
+import com.mafia.mafiabackend.model.GameResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +13,5 @@ public class GameFinishDtoRequest {
     private Long id;
     @Schema(description = "Параметр на завершение игры: если выиграли красные: 1, " +
             "черные: 0, скип игры и удаление из базы: 2")
-    private Integer redWin;
+    private GameResult result;
 }

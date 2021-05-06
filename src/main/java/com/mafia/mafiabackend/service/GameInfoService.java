@@ -6,6 +6,7 @@ import com.mafia.mafiabackend.dto.GameInfoDtoRequest;
 import com.mafia.mafiabackend.dto.GameInfoDtoResponse;
 import com.mafia.mafiabackend.model.Game;
 import com.mafia.mafiabackend.model.GameInfo;
+import com.mafia.mafiabackend.model.GameResult;
 import com.mafia.mafiabackend.model.Role;
 import com.mafia.mafiabackend.repository.GameInfoRepository;
 import lombok.AllArgsConstructor;
@@ -23,9 +24,8 @@ public class GameInfoService {
 
     public GameInfoDtoResponse getGameInfos(Long id) {
         List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
-        Set<GameInfo> targetSet = new HashSet<>(gameInfos);
         return GameInfoDtoResponse.builder()
-                .gameInfos(targetSet)
+                .gameInfos(gameInfos)
                 .gameFinished(false)
                 .build();
     }
@@ -43,23 +43,26 @@ public class GameInfoService {
         gameInfoRepository.save(gameInfo);
 
         Game game = gameInfo.getGame();
-        if (isGameFinishedByBlack(game)) {
+
+
+        boolean gameFinishedByBlack = isGameFinishedByBlack(game);
+        boolean gameFinishedByRed = isGameFinishedByRed(game);
+        if (gameFinishedByBlack) {
             gameService.finishGame(GameFinishDtoRequest.builder()
                     .id(game.getId())
-                    .redWin(0)
+                    .result(GameResult.BLACK_WIN)
                     .build());
         }
-        if (isGameFinishedByRed(game)) {
+        if (gameFinishedByRed) {
             gameService.finishGame(GameFinishDtoRequest.builder()
                     .id(game.getId())
-                    .redWin(1)
+                    .result(GameResult.RED_WIN)
                     .build());
         }
 
         return GameInfoDtoResponse.builder()
-//                .gameInfos(game.getGameInfos())
-                .gameInfo(gameInfo)
-                .gameFinished(isGameFinishedByBlack(game))
+                .gameInfos(game.getGameInfos())
+                .gameFinished(gameFinishedByBlack || gameFinishedByRed)
                 .build();
     }
 

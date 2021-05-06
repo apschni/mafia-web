@@ -24,7 +24,7 @@ public class Player {
 
     private String name;
 
-    @OneToMany(mappedBy = "player", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "player", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<GameInfo> gameInfos;
 }

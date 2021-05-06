@@ -10,12 +10,12 @@ import java.util.List;
 @Builder
 public class StatisticsDtoResponse {
     private String name;
-    private List<Game> games;
-    private Integer points;
-    private Integer winRate;
-    private Integer averageFouls;
-    private Integer deathCount;
-    private Integer winsByBlack;
-    private Integer winsByRed;
+    private List<GameDtoResponse> games;
+    private Long points;
+    private Long winRate;
+    private Double averageFouls;
+    private Long deathCount;
+    private Long winsByBlack;
+    private Long winsByRed;
     private Integer totalGames;
 }

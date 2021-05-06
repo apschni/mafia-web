@@ -25,8 +25,8 @@ public class PlayerController {
             summary = "Добавление нового игрока"
     )
     @PostMapping("/player")
-    public Long addPlayer(@RequestBody String name) {
-        return playerService.addPlayer(name);
+    public Long addPlayer(@RequestBody PlayerDtoRequest playerDtoRequest) {
+        return playerService.addPlayer(playerDtoRequest.getName());
     }
 
     @Operation(

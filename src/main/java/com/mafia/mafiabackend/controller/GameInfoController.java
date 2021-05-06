@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @Tag(name = "GameInfo Controller", description = "Управление сущностями GameInfo")
 public class GameInfoController {
@@ -27,8 +26,8 @@ public class GameInfoController {
     @Operation(
             summary = "По id игры получает список всех gameInfos (состояний игроков сейчас)"
     )
-    @GetMapping("/gameInfo")
-    public GameInfoDtoResponse getGameInfos(@RequestBody Long id) {
+    @GetMapping("/gameInfo/{id}")
+    public GameInfoDtoResponse getGameInfos(@PathVariable("id") Long id) {
         return gameInfoService.getGameInfos(id);
     }
 
