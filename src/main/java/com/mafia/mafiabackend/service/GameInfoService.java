@@ -3,13 +3,13 @@ package com.mafia.mafiabackend.service;
 
 import com.mafia.mafiabackend.dto.GameFinishDtoRequest;
 import com.mafia.mafiabackend.dto.GameInfoDtoRequest;
-import com.mafia.mafiabackend.dto.GameInfoDtoResponse;
 import com.mafia.mafiabackend.model.Game;
 import com.mafia.mafiabackend.model.GameInfo;
 import com.mafia.mafiabackend.model.GameResult;
 import com.mafia.mafiabackend.model.Role;
 import com.mafia.mafiabackend.repository.GameInfoRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,15 +20,7 @@ public class GameInfoService {
     private final GameInfoRepository gameInfoRepository;
     private final GameService gameService;
 
-    public GameInfoDtoResponse getGameInfos(Long id) {
-        List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
-        return GameInfoDtoResponse.builder()
-                .gameInfos(gameInfos)
-                .gameFinished(false)
-                .build();
-    }
-
-    public GameInfoDtoResponse updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
+    public HttpStatus updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
         GameInfo gameInfo = gameInfoRepository.findByPlayerIdAndGameId(
                 gameInfoDtoRequest.getPlayerId(),
                 gameInfoDtoRequest.getId())
@@ -58,10 +50,7 @@ public class GameInfoService {
                     .build());
         }
 
-        return GameInfoDtoResponse.builder()
-                .gameInfos(game.getGameInfos())
-                .gameFinished(gameFinishedByBlack || gameFinishedByRed)
-                .build();
+        return HttpStatus.OK;
     }
 
     private boolean isGameFinishedByRed(Game game) {
