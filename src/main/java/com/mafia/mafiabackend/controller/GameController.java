@@ -47,7 +47,15 @@ public class GameController {
     }
 
     @Operation(
-            summary = "Получение списка id всех активных игр"
+            summary = "Получение списка последних десяти неактивных игр со списком их игроков и исходами"
+    )
+    @GetMapping("/game/nonactive")
+    public List<NonActiveGameDtoResponse> getLastTenNonActiveGames() {
+        return gameService.getLastTenNonActiveGames();
+    }
+
+    @Operation(
+            summary = "Получение списка всех активных игр со списком их игроков"
     )
     @GetMapping("/game/active")
     public List<ActiveGamesDtoResponse> getActiveGames() {

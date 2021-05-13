@@ -5,6 +5,7 @@ import com.mafia.mafiabackend.dto.PlayerDtoResponse;
 import com.mafia.mafiabackend.dto.StatisticsDtoResponse;
 import com.mafia.mafiabackend.service.PlayerService;
 import com.mafia.mafiabackend.service.StatisticsService;
+import com.mafia.mafiabackend.validation.PlayerExists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class PlayerController {
     )
     @GetMapping("/player")
     public List<PlayerDtoResponse> getAllPlayers() {
-        return playerService.getAllPlayers();
+        return playerService.getAllPlayersOrderedByTotalGamesPlayed();
     }
 
 
@@ -47,7 +48,7 @@ public class PlayerController {
             summary = "Получение игрока по его id"
     )
     @GetMapping("/player/{id}")
-    public PlayerDtoResponse getPlayerById(@PathVariable("id") @NotNull Long id) {
+    public PlayerDtoResponse getPlayerById(@PathVariable("id") @NotNull @PlayerExists Long id) {
         return playerService.getPlayerById(id);
     }
 
@@ -55,7 +56,7 @@ public class PlayerController {
             summary = "Удаляет игрока по его id"
     )
     @DeleteMapping("/player/{id}")
-    public void deletePlayerById(@PathVariable("id") @NotNull Long id){
+    public void deletePlayerById(@PathVariable("id") @NotNull @PlayerExists Long id){
         playerService.deletePlayerById(id);
     }
 
@@ -63,7 +64,7 @@ public class PlayerController {
             summary = "Получает статистику по всем завершённым играм игрока с данным id"
     )
     @GetMapping("/player/{id}/stats")
-    public StatisticsDtoResponse getStatisticsByPlayerId(@PathVariable("id") @NotNull Long id){
+    public StatisticsDtoResponse getStatisticsByPlayerId(@PathVariable("id") @NotNull @PlayerExists Long id){
         return statisticsService.getStatisticsByPlayerId(id);
     }
 }

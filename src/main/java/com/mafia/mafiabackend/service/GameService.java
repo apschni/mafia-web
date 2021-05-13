@@ -7,12 +7,11 @@ import com.mafia.mafiabackend.repository.GameRepository;
 import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,28 +19,27 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class GameService {
+
     private final GameRepository gameRepository;
     private final GameInfoRepository gameInfoRepository;
     private final PlayerRepository playerRepository;
+    private final ConversionService conversionService;
 
-
-    public GameInfoDtoResponse getGameInfos(Long id) {
+    public GameInfoDtoResponse getGameInfosByGameId(Long id) {
         List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
         if (gameInfos.isEmpty()) {
             return null;
         }
 
-        List<GameInfoInnerDto> gameInfoInnerDtos = new ArrayList<>();
+        List<GameInfoDto> gameInfoInnerDtos = new ArrayList<>();
 
         for (GameInfo gameInfo : gameInfos) {
-            gameInfoInnerDtos.add(GameInfoInnerDto.builder()
-                    .gameInfo(gameInfo)
-                    .playerName(gameInfo.getPlayer().getName())
-                    .build());
+            gameInfoInnerDtos.add(conversionService.convert(gameInfo, GameInfoDto.class));
         }
         return GameInfoDtoResponse.builder()
                 .playerInfos(gameInfoInnerDtos)
                 .gameFinished(false)
+                .gameId(id)
                 .build();
     }
 
@@ -61,15 +59,32 @@ public class GameService {
         return activeGamesDtoResponses;
     }
 
-    public Long finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
-        Game game = gameRepository.findById(gameFinishDtoRequest.getId()).orElse(null);
+    public List<NonActiveGameDtoResponse> getLastTenNonActiveGames() {
+        List<Game> games = gameRepository.findAllByGameFinishedTrue();
+        List<NonActiveGameDtoResponse> nonActiveGameDtoResponses = new ArrayList<>();
+        games.stream()
+                .sorted(Comparator.comparing(x -> ((Game) x).getMonitoringInfo().getUpdatedAt()).reversed())
+                .limit(10)
+                .forEach(game -> {
+                    nonActiveGameDtoResponses.add(NonActiveGameDtoResponse.builder()
+                            .gameId(game.getId())
+                            .playerNames(game.getGameInfos().stream()
+                                    .map(GameInfo::getPlayer)
+                                    .map(Player::getName)
+                                    .collect(Collectors.toList()))
+                            .winByRed(game.getRedWin())
+                            .build());
+                });
+        return nonActiveGameDtoResponses;
+    }
 
-        if (game == null) {
-            log.error("Failed to finish game with id: "
-                    + gameFinishDtoRequest.getId()
-                    + " (no such game in database with id: " + gameFinishDtoRequest.getId() + ")");
+    public Long finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
+        Optional<Game> optionalGame = gameRepository.findById(gameFinishDtoRequest.getId());
+
+        if (!optionalGame.isPresent()) {
             return null;
         }
+        Game game = optionalGame.get();
 
         if (gameFinishDtoRequest.getResult() == GameResult.SKIP_AND_DELETE) {
             gameInfoRepository.deleteAll(game.getGameInfos());
@@ -80,6 +95,7 @@ public class GameService {
 
         game.setRedWin(gameFinishDtoRequest.getResult() == GameResult.RED_WIN);
         game.setGameFinished(true);
+        game.getMonitoringInfo().setUpdatedAt(Instant.now());
         gameRepository.save(game);
         log.info("Game with id: " + gameFinishDtoRequest.getId() + " has been finished");
         return game.getId();
@@ -90,7 +106,12 @@ public class GameService {
                 .gameType(gameDtoRequest.getGameType())
                 .numberOfPlayers(gameDtoRequest.getPlayersIds().size())
                 .gameFinished(false)
+                .monitoringInfo(MonitoringInfo.builder()
+                        .createdAt(Instant.now())
+                        .updatedAt(Instant.now())
+                        .build())
                 .build();
+
         gameRepository.save(game);
 
         Map<Long, Role> playerIdToRole = new HashMap<>();
@@ -106,6 +127,7 @@ public class GameService {
                 .collect(Collectors.toMap(Player::getId, Function.identity()));
         for (int i = 0; i < playersIds.size(); i++) {
             Long id = playersIds.get(i);
+            Player player = idToPlayer.get(id);
             GameInfo gameInfo = GameInfo.builder()
                     .game(game)
                     .alive(true)
@@ -113,17 +135,22 @@ public class GameService {
                     .points(0)
                     .sitNumber(i + 1)
                     .role(playerIdToRole.get(id))
-                    .player(idToPlayer.get(id))
+                    .player(player)
+                    .monitoringInfo(MonitoringInfo.builder()
+                            .createdAt(Instant.now())
+                            .updatedAt(Instant.now())
+                            .build())
                     .build();
             gameInfos.add(gameInfo);
         }
 
 
-        List<GameInfoInnerDto> gameInfoInnerDtos = gameInfoSaveAndCreateDto(gameInfos);
+        List<GameInfoDto> gameInfoInnerDtos = gameInfoSaveAndCreateDto(gameInfos);
         log.info("Game with id: " + game.getId() + "and game type: " + game.getGameType() + " has been created");
         return GameInfoDtoResponse.builder()
                 .playerInfos(gameInfoInnerDtos)
                 .gameFinished(false)
+                .gameId(game.getId())
                 .build();
     }
 
@@ -141,26 +168,22 @@ public class GameService {
             Long playerId = gameInfo.getPlayerId();
             Role role = playerIdToRole.get(playerId);
             gameInfo.setRole(role);
+            gameInfo.getMonitoringInfo().setUpdatedAt(Instant.now());
         });
 
-        List<GameInfoInnerDto> gameInfoInnerDtos = gameInfoSaveAndCreateDto(gameInfos);
+        List<GameInfoDto> gameInfoDtos = gameInfoSaveAndCreateDto(gameInfos);
         return GameInfoDtoResponse.builder()
-                .playerInfos(gameInfoInnerDtos)
+                .playerInfos(gameInfoDtos)
                 .gameFinished(false)
+                .gameId(id)
                 .build();
     }
 
-    private List<GameInfoInnerDto> gameInfoSaveAndCreateDto(List<GameInfo> gameInfos) {
-        List<GameInfo> gameInfos1 = gameInfoRepository.saveAll(gameInfos);
+    private List<GameInfoDto> gameInfoSaveAndCreateDto(List<GameInfo> gameInfos) {
 
-        List<GameInfoInnerDto> gameInfoInnerDtos = new ArrayList<>();
-        for (GameInfo gameInfo1 : gameInfos1) {
-            gameInfoInnerDtos.add(GameInfoInnerDto.builder()
-                    .gameInfo(gameInfo1)
-                    .playerName(gameInfo1.getPlayer().getName())
-                    .build());
-        }
-        return gameInfoInnerDtos;
+        return gameInfoRepository.saveAll(gameInfos).stream()
+                .map(gameInfo -> conversionService.convert(gameInfo, GameInfoDto.class))
+                .collect(Collectors.toList());
     }
 
     private void randomizeRoles(GameType gameType,

@@ -13,8 +13,10 @@ import java.util.List;
 public class GameInfoDtoResponse {
 
     @Schema(description = "Список всех состояний, принадлежащих данной игре")
-    private List<GameInfoInnerDto> playerInfos;
+    private List<GameInfoDto> playerInfos;
 
     @Schema(description = "Индикатор, показывающий, закончена ли игра")
     private Boolean gameFinished;
+
+    private Long gameId;
 }

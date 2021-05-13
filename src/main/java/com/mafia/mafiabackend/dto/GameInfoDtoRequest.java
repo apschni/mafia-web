@@ -1,5 +1,6 @@
 package com.mafia.mafiabackend.dto;
 
+import com.mafia.mafiabackend.validation.GameExists;
 import com.mafia.mafiabackend.validation.PlayerExists;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class GameInfoDtoRequest {
     @Schema(description = "Id игры", example = "305")
+    @GameExists
     @NotNull
     private Long id;
 

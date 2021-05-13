@@ -27,4 +27,7 @@ public class Player {
     @OneToMany(mappedBy = "player", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<GameInfo> gameInfos;
+
+    @Embedded
+    private MonitoringInfo monitoringInfo;
 }

@@ -1,6 +1,7 @@
 package com.mafia.mafiabackend.dto;
 
 import com.mafia.mafiabackend.model.GameResult;
+import com.mafia.mafiabackend.validation.GameExists;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotNull;
 public class GameFinishDtoRequest {
     @Schema(description = "Id игры", example = "666")
     @NotNull
+    @GameExists
     private Long id;
 
     @Schema(description = "Параметр на завершение игры: если выиграли красные: RED_WIN, " +

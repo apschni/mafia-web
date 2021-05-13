@@ -50,6 +50,8 @@ public class GameInfo {
     @Column(name = "player_id", insertable = false, updatable = false)
     private Long playerId;
 
+    @Embedded
+    private MonitoringInfo monitoringInfo;
 
 }
 

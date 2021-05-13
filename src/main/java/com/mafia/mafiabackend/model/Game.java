@@ -34,4 +34,7 @@ public class Game {
     @JsonIgnore
     private List<GameInfo> gameInfos;
 
+    @Embedded
+    private MonitoringInfo monitoringInfo;
+
 }
