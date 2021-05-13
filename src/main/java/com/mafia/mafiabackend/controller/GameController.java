@@ -26,7 +26,7 @@ public class GameController {
             description = "Позволяет создать игру и автоматически распределяет роли"
     )
     @PostMapping("/game")
-    public GameInfoDtoResponse createGame(@RequestBody @Valid GameDtoRequest gameDtoRequest) {
+    public Long createGame(@RequestBody @Valid GameDtoRequest gameDtoRequest) {
         return gameService.createGame(gameDtoRequest);
     }
 

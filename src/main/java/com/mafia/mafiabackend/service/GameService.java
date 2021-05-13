@@ -85,7 +85,7 @@ public class GameService {
             return null;
         }
         Game game = optionalGame.get();
-        if (game.getGameFinished()){
+        if (game.getGameFinished()) {
             return null;
         }
 
@@ -104,7 +104,7 @@ public class GameService {
         return game.getId();
     }
 
-    public GameInfoDtoResponse createGame(GameDtoRequest gameDtoRequest) {
+    public Long createGame(GameDtoRequest gameDtoRequest) {
         Game game = Game.builder()
                 .gameType(gameDtoRequest.getGameType())
                 .numberOfPlayers(gameDtoRequest.getPlayersIds().size())
@@ -148,13 +148,9 @@ public class GameService {
         }
 
 
-        List<GameInfoDto> gameInfoInnerDtos = gameInfoSaveAndCreateDto(gameInfos);
+        gameInfoRepository.saveAll(gameInfos);
         log.info("Game with id: " + game.getId() + "and game type: " + game.getGameType() + " has been created");
-        return GameInfoDtoResponse.builder()
-                .playerInfos(gameInfoInnerDtos)
-                .gameFinished(false)
-                .gameId(game.getId())
-                .build();
+        return game.getId();
     }
 
 
