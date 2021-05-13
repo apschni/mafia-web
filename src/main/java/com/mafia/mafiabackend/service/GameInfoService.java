@@ -23,6 +23,10 @@ public class GameInfoService {
                 gameInfoDtoRequest.getPlayerId(),
                 gameInfoDtoRequest.getId())
                 .orElseThrow(RuntimeException::new);
+        if (gameInfo.getGame().getGameFinished()){
+            return HttpStatus.NOT_ACCEPTABLE;
+        }
+
         gameInfo.setFoul(gameInfoDtoRequest.getFouls());
         gameInfo.setAlive(gameInfoDtoRequest.getAlive());
         if (gameInfoDtoRequest.getPoints() != null) {
