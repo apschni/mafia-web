@@ -2,7 +2,6 @@ package com.mafia.mafiabackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -34,5 +33,8 @@ public class Game {
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<GameInfo> gameInfos;
+
+    @Embedded
+    private MonitoringInfo monitoringInfo;
 
 }

@@ -1,13 +1,10 @@
 package com.mafia.mafiabackend.controller;
 
-import com.mafia.mafiabackend.dto.GameDtoRequest;
-import com.mafia.mafiabackend.dto.GameFinishDtoRequest;
-import com.mafia.mafiabackend.dto.GameReshuffleDtoRequest;
+import com.mafia.mafiabackend.dto.*;
 import com.mafia.mafiabackend.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,8 +26,8 @@ public class GameController {
             description = "Позволяет создать игру и автоматически распределяет роли"
     )
     @PostMapping("/game")
-    public ResponseEntity<Long> createGame(@RequestBody @Valid GameDtoRequest gameDtoRequest) {
-        return ResponseEntity.ok(gameService.createGame(gameDtoRequest));
+    public GameInfoDtoResponse createGame(@RequestBody @Valid GameDtoRequest gameDtoRequest) {
+        return gameService.createGame(gameDtoRequest);
     }
 
     @Operation(
@@ -45,15 +42,23 @@ public class GameController {
             summary = "Тасует роли заново для игры с данным id и типом"
     )
     @PostMapping("/game/reshuffle")
-    public Long reshuffleRoles(@RequestBody @Valid GameReshuffleDtoRequest gameReshuffleDtoRequest) {
+    public GameInfoDtoResponse reshuffleRoles(@RequestBody @Valid GameReshuffleDtoRequest gameReshuffleDtoRequest) {
         return gameService.reshuffleRoles(gameReshuffleDtoRequest.getId(), gameReshuffleDtoRequest.getGameType());
     }
 
     @Operation(
-            summary = "Получение списка id всех активных игр"
+            summary = "Получение списка последних десяти неактивных игр со списком их игроков и исходами"
+    )
+    @GetMapping("/game/nonactive")
+    public List<NonActiveGameDtoResponse> getLastTenNonActiveGames() {
+        return gameService.getLastTenNonActiveGames();
+    }
+
+    @Operation(
+            summary = "Получение списка всех активных игр со списком их игроков"
     )
     @GetMapping("/game/active")
-    public List<Long> getActiveGames() {
+    public List<ActiveGamesDtoResponse> getActiveGames() {
         return gameService.getActiveGames();
     }
 

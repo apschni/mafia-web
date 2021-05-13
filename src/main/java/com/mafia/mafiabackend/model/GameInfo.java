@@ -3,7 +3,6 @@ package com.mafia.mafiabackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -44,12 +43,15 @@ public class GameInfo {
 
     private Integer foul;
 
-    @JsonIgnore
     @Column(name = "game_id", insertable = false, updatable = false)
     private Long gameId;
 
+
     @Column(name = "player_id", insertable = false, updatable = false)
     private Long playerId;
+
+    @Embedded
+    private MonitoringInfo monitoringInfo;
 
 }
 

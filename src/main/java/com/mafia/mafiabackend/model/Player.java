@@ -2,7 +2,6 @@ package com.mafia.mafiabackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -28,4 +27,7 @@ public class Player {
     @OneToMany(mappedBy = "player", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<GameInfo> gameInfos;
+
+    @Embedded
+    private MonitoringInfo monitoringInfo;
 }
