@@ -31,13 +31,13 @@ public class GameService {
             return null;
         }
 
-        List<GameInfoDto> gameInfoInnerDtos = new ArrayList<>();
+        List<GameInfoDto> gameInfoDtos = new ArrayList<>();
 
         for (GameInfo gameInfo : gameInfos) {
-            gameInfoInnerDtos.add(conversionService.convert(gameInfo, GameInfoDto.class));
+            gameInfoDtos.add(conversionService.convert(gameInfo, GameInfoDto.class));
         }
         return GameInfoDtoResponse.builder()
-                .playerInfos(gameInfoInnerDtos)
+                .playerInfos(gameInfoDtos)
                 .gameFinished(false)
                 .gameId(id)
                 .build();
@@ -85,6 +85,9 @@ public class GameService {
             return null;
         }
         Game game = optionalGame.get();
+        if (game.getGameFinished()){
+            return null;
+        }
 
         if (gameFinishDtoRequest.getResult() == GameResult.SKIP_AND_DELETE) {
             gameInfoRepository.deleteAll(game.getGameInfos());
