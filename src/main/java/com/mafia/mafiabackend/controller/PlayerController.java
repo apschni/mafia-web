@@ -32,7 +32,7 @@ public class PlayerController {
             summary = "Добавление нового игрока"
     )
     @PostMapping("/player")
-    public HttpStatus addPlayer(@RequestBody @Valid PlayerDtoRequest playerDtoRequest) {
+    public Long addPlayer(@RequestBody @Valid PlayerDtoRequest playerDtoRequest) {
         return playerService.addPlayer(playerDtoRequest.getName());
     }
 

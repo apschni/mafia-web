@@ -24,9 +24,9 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final ConversionService conversionService;
 
-    public HttpStatus addPlayer(String name) {
+    public Long addPlayer(String name) {
         if (playerRepository.existsByName(name)){
-            return HttpStatus.CONFLICT;
+            return null;
         }
 
         Player player = playerRepository.save(Player.builder()
@@ -37,7 +37,7 @@ public class PlayerService {
                         .build())
                 .build());
         log.info("Created player: " + player.toString());
-        return HttpStatus.CREATED;
+        return player.getId();
     }
 
     public List<PlayerDtoResponse> getAllPlayersOrderedByTotalGamesPlayed() {
