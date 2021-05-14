@@ -27,6 +27,8 @@ public class Game {
 
     private Boolean gameFinished;
 
+    private Boolean gameStarted;
+
     private Integer numberOfPlayers;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)

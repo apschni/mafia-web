@@ -27,7 +27,9 @@ public class GameService {
     private final ConversionService conversionService;
 
     public GameInfoDtoResponse getGameInfosByGameId(Long id) {
-        List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
+        List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id).stream()
+                .sorted(Comparator.comparing(GameInfo::getAlive).reversed().thenComparing(GameInfo::getSitNumber))
+                .collect(Collectors.toList());
         if (gameInfos.isEmpty()) {
             return null;
         }
@@ -37,10 +39,17 @@ public class GameService {
         for (GameInfo gameInfo : gameInfos) {
             gameInfoDtos.add(conversionService.convert(gameInfo, GameInfoDto.class));
         }
+        Optional<Game> optionalGame = gameRepository.findById(id);
+        boolean gameStarted = false;
+        if (optionalGame.isPresent()) {
+            Game game = optionalGame.get();
+            gameStarted = game.getGameStarted();
+        }
         return GameInfoDtoResponse.builder()
                 .playerInfos(gameInfoDtos)
                 .gameFinished(false)
                 .gameId(id)
+                .gameStarted(gameStarted)
                 .build();
     }
 
@@ -110,6 +119,7 @@ public class GameService {
                 .gameType(gameDtoRequest.getGameType())
                 .numberOfPlayers(gameDtoRequest.getPlayersIds().size())
                 .gameFinished(false)
+                .gameStarted(false)
                 .monitoringInfo(MonitoringInfo.builder()
                         .createdAt(Instant.now())
                         .updatedAt(Instant.now())
@@ -176,12 +186,14 @@ public class GameService {
                 .playerInfos(gameInfoDtos)
                 .gameFinished(false)
                 .gameId(id)
+                .gameStarted(false)
                 .build();
     }
 
     private List<GameInfoDto> gameInfoSaveAndCreateDto(List<GameInfo> gameInfos) {
 
         return gameInfoRepository.saveAll(gameInfos).stream()
+                .sorted(Comparator.comparing(GameInfo::getSitNumber))
                 .map(gameInfo -> conversionService.convert(gameInfo, GameInfoDto.class))
                 .collect(Collectors.toList());
     }
@@ -218,6 +230,15 @@ public class GameService {
         }
         for (Long id : playersIds) {
             playerIdToRole.put(id, Role.RED);
+        }
+    }
+
+    public void startGame(Long gameId) {
+        Optional<Game> optionalGame = gameRepository.findById(gameId);
+        if (optionalGame.isPresent()) {
+            Game game = optionalGame.get();
+            game.setGameStarted(true);
+            gameRepository.save(game);
         }
     }
 }

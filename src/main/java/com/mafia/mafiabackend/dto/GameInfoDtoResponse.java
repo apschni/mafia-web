@@ -19,4 +19,6 @@ public class GameInfoDtoResponse {
     private Boolean gameFinished;
 
     private Long gameId;
+
+    private Boolean gameStarted;
 }
