@@ -1,5 +1,6 @@
 package com.mafia.mafiabackend.dto;
 
+import com.mafia.mafiabackend.validation.PlayerNameExists;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -12,5 +13,6 @@ public class PlayerDtoRequest {
     @Schema(description = "Имя игрока", example = "Вовчик")
     @NotNull
     @Size(min = 3, max = 10)
+    @PlayerNameExists
     private String name;
 }
