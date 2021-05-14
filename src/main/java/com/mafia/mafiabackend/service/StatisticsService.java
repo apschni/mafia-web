@@ -107,13 +107,12 @@ public class StatisticsService {
                     List<GameInfo> gameInfos = player.getGameInfos().stream()
                             .filter(gameInfo -> gameInfo.getGame().getGameFinished())
                             .collect(Collectors.toList());
-                    Long winsByRedRole = getWinsByRole(true, gameInfos);
-                    Long winsByBlackRole = getWinsByRole(false, gameInfos);
+                    long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
                     return GameRatingDtoResponse.builder()
                             .playerName(player.getName())
-                            .totalWins(winsByRedRole + winsByBlackRole)
-                            .totalLoses(gameInfos.size() - winsByRedRole + winsByBlackRole)
-                            .rating((double) (gameInfos.size() == 0 ? 0 : winsByRedRole / gameInfos.size()))
+                            .totalWins(totalWins)
+                            .totalGames((long) gameInfos.size())
+                            .rating(gameInfos.size() == 0 ? 0 : Math.pow(totalWins, 2) / gameInfos.size())
                             .build();
                 })
                 .sorted(Comparator.comparing(x -> ((GameRatingDtoResponse) x).getRating()).reversed())

@@ -8,6 +8,6 @@ import lombok.Data;
 public class GameRatingDtoResponse {
     private String playerName;
     private Long totalWins;
-    private Long totalLoses;
+    private Long totalGames;
     private Double rating;
 }
