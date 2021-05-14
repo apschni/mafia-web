@@ -8,6 +8,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -78,22 +79,22 @@ public class GameService {
         return nonActiveGameDtoResponses;
     }
 
-    public Long finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
+    public HttpStatus finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
         Optional<Game> optionalGame = gameRepository.findById(gameFinishDtoRequest.getId());
 
         if (!optionalGame.isPresent()) {
-            return null;
+            return HttpStatus.NOT_FOUND;
         }
         Game game = optionalGame.get();
         if (game.getGameFinished()) {
-            return null;
+            return HttpStatus.ALREADY_REPORTED;
         }
 
         if (gameFinishDtoRequest.getResult() == GameResult.SKIP_AND_DELETE) {
             gameInfoRepository.deleteAll(game.getGameInfos());
             gameRepository.deleteById(gameFinishDtoRequest.getId());
             log.info("Game with id: " + gameFinishDtoRequest.getId() + " has been deleted from database");
-            return gameFinishDtoRequest.getId();
+            return HttpStatus.OK;
         }
 
         game.setRedWin(gameFinishDtoRequest.getResult() == GameResult.RED_WIN);
@@ -101,7 +102,7 @@ public class GameService {
         game.getMonitoringInfo().setUpdatedAt(Instant.now());
         gameRepository.save(game);
         log.info("Game with id: " + gameFinishDtoRequest.getId() + " has been finished");
-        return game.getId();
+        return HttpStatus.OK;
     }
 
     public Long createGame(GameDtoRequest gameDtoRequest) {

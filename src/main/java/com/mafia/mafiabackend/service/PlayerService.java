@@ -8,6 +8,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,7 +24,11 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final ConversionService conversionService;
 
-    public Long addPlayer(String name) {
+    public HttpStatus addPlayer(String name) {
+        if (playerRepository.existsByName(name)){
+            return HttpStatus.CONFLICT;
+        }
+
         Player player = playerRepository.save(Player.builder()
                 .name(name)
                 .monitoringInfo(MonitoringInfo.builder()
@@ -32,7 +37,7 @@ public class PlayerService {
                         .build())
                 .build());
         log.info("Created player: " + player.toString());
-        return player.getId();
+        return HttpStatus.CREATED;
     }
 
     public List<PlayerDtoResponse> getAllPlayersOrderedByTotalGamesPlayed() {

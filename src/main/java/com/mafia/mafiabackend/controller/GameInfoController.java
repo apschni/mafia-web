@@ -39,6 +39,4 @@ public class GameInfoController {
     public GameInfoDtoResponse getGameInfos(@PathVariable("id") @NotNull @GameExists Long id) {
         return gameService.getGameInfosByGameId(id);
     }
-
-
 }

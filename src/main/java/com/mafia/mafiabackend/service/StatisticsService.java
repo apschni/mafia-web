@@ -1,6 +1,7 @@
 package com.mafia.mafiabackend.service;
 
 import com.mafia.mafiabackend.dto.GameDtoResponse;
+import com.mafia.mafiabackend.dto.GameRatingDtoResponse;
 import com.mafia.mafiabackend.dto.StatisticsDtoResponse;
 import com.mafia.mafiabackend.model.Game;
 import com.mafia.mafiabackend.model.GameInfo;
@@ -10,9 +11,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,5 +96,30 @@ public class StatisticsService {
         return gameInfos.stream()
                 .filter(gameInfo -> !gameInfo.getAlive())
                 .count();
+    }
+
+    public List<GameRatingDtoResponse> getPlayersRating() {
+        List<GameRatingDtoResponse> gameRatingDtoResponses = new ArrayList<>();
+
+        List<Player> players = playerRepository.findAll();
+
+        Map<String, List<GameInfo>> playerToGameinfos = new HashMap<>();
+        players.forEach(player -> playerToGameinfos.put(player.getName(), player.getGameInfos()));
+
+        playerToGameinfos.forEach((name, gameInfos) -> {
+            Long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
+
+            gameRatingDtoResponses.add(GameRatingDtoResponse.builder()
+                .playerName(name)
+                .totalWins(totalWins)
+                .totalLoses(gameInfos.size() - totalWins)
+                .rating((double) ((totalWins * totalWins) / gameInfos.size()))
+                .build());
+        });
+
+        return gameRatingDtoResponses.stream()
+                .sorted(Comparator.comparing(x -> ((GameRatingDtoResponse) x).getRating()).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
     }
 }
