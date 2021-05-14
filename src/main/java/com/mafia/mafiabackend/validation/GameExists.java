@@ -11,7 +11,9 @@ import java.lang.annotation.*;
 public @interface GameExists {
 
     String message() default "Игры с данным ID не существует";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
 }

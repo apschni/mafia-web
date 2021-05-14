@@ -10,7 +10,6 @@ import com.mafia.mafiabackend.validation.PlayerExists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,7 +39,7 @@ public class PlayerController {
             summary = "Рейтинг по последним 10 игрокам"
     )
     @GetMapping("/player/rating")
-    public List<GameRatingDtoResponse> getPlayersRating(){
+    public List<GameRatingDtoResponse> getPlayersRating() {
         return statisticsService.getPlayersRating();
     }
 
@@ -66,7 +65,7 @@ public class PlayerController {
             summary = "Удаляет игрока по его id"
     )
     @DeleteMapping("/player/{id}")
-    public void deletePlayerById(@PathVariable("id") @NotNull @PlayerExists Long id){
+    public void deletePlayerById(@PathVariable("id") @NotNull @PlayerExists Long id) {
         playerService.deletePlayerById(id);
     }
 
@@ -74,7 +73,7 @@ public class PlayerController {
             summary = "Получает статистику по всем завершённым играм игрока с данным id"
     )
     @GetMapping("/player/{id}/stats")
-    public StatisticsDtoResponse getStatisticsByPlayerId(@PathVariable("id") @NotNull @PlayerExists Long id){
+    public StatisticsDtoResponse getStatisticsByPlayerId(@PathVariable("id") @NotNull @PlayerExists Long id) {
         return statisticsService.getStatisticsByPlayerId(id);
     }
 }

@@ -11,7 +11,10 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 @Service
@@ -99,25 +102,18 @@ public class StatisticsService {
     }
 
     public List<GameRatingDtoResponse> getPlayersRating() {
-        List<GameRatingDtoResponse> gameRatingDtoResponses = new ArrayList<>();
-
-        List<Player> players = playerRepository.findAll();
-
-        Map<String, List<GameInfo>> playerToGameinfos = new HashMap<>();
-        players.forEach(player -> playerToGameinfos.put(player.getName(), player.getGameInfos()));
-
-        playerToGameinfos.forEach((name, gameInfos) -> {
-            Long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
-
-            gameRatingDtoResponses.add(GameRatingDtoResponse.builder()
-                .playerName(name)
-                .totalWins(totalWins)
-                .totalLoses(gameInfos.size() - totalWins)
-                .rating((double) ((totalWins * totalWins) / gameInfos.size()))
-                .build());
-        });
-
-        return gameRatingDtoResponses.stream()
+        return playerRepository.findAll().stream()
+                .map(player -> {
+                    Long winsByRedRole = getWinsByRole(true, player.getGameInfos());
+                    Long winsByBlackRole = getWinsByRole(false, player.getGameInfos());
+                    return GameRatingDtoResponse.builder()
+                            .playerName(player.getName())
+                            .totalWins(winsByRedRole + winsByBlackRole)
+                            .totalLoses(player.getGameInfos().size() - winsByRedRole + winsByBlackRole)
+                            .rating((double) ((winsByRedRole + winsByBlackRole * winsByRedRole + winsByBlackRole) /
+                                    player.getGameInfos().size()))
+                            .build();
+                })
                 .sorted(Comparator.comparing(x -> ((GameRatingDtoResponse) x).getRating()).reversed())
                 .limit(10)
                 .collect(Collectors.toList());

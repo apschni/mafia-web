@@ -8,7 +8,6 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,7 +24,7 @@ public class PlayerService {
     private final ConversionService conversionService;
 
     public Long addPlayer(String name) {
-        if (playerRepository.existsByName(name)){
+        if (playerRepository.existsByName(name)) {
             return null;
         }
 

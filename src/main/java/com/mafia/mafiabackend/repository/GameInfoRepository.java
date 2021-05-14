@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface GameInfoRepository extends JpaRepository<GameInfo, Long> {
     Optional<GameInfo> findByPlayerIdAndGameId(Long playerId, Long id);
+
     List<GameInfo> findAllByGameId(Long id);
 }

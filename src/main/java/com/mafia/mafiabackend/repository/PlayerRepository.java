@@ -4,5 +4,5 @@ import com.mafia.mafiabackend.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
-    public Boolean existsByName(String name);
+    Boolean existsByName(String name);
 }

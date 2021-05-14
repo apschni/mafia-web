@@ -1,7 +1,6 @@
 package com.mafia.mafiabackend.validation;
 
 import com.mafia.mafiabackend.repository.GameRepository;
-import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
