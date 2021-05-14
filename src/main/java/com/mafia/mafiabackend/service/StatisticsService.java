@@ -11,10 +11,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,17 +104,25 @@ public class StatisticsService {
                     List<GameInfo> gameInfos = player.getGameInfos().stream()
                             .filter(gameInfo -> gameInfo.getGame().getGameFinished())
                             .collect(Collectors.toList());
+                    if (gameInfos.size() < 3) {
+                        return null;
+                    }
                     long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
+                    if (totalWins == 0) {
+                        return null;
+                    }
                     return GameRatingDtoResponse.builder()
                             .playerName(player.getName())
                             .totalWins(totalWins)
                             .totalGames((long) gameInfos.size())
-                            .rating(gameInfos.size() == 0 || totalWins == 0 ?
-                                    0 : Double.parseDouble(String.format("%.1f",
-                                    Math.pow(totalWins, 2) / gameInfos.size())))
+                            .rating(Double.parseDouble(String.format("%.1f",
+                                    Math.pow(totalWins, 2) / gameInfos.size()).replaceAll(",", ".")))
                             .build();
                 })
-                .sorted(Comparator.comparing(x -> ((GameRatingDtoResponse) x).getRating()).reversed())
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(x ->
+                        ((GameRatingDtoResponse) x).getRating())
+                        .reversed())
                 .limit(10)
                 .collect(Collectors.toList());
     }
