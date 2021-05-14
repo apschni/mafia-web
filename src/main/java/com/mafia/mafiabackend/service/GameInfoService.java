@@ -58,11 +58,7 @@ public class GameInfoService {
     }
 
     private boolean isGameFinishedByRed(Game game) {
-        List<GameInfo> gameInfos = game.getGameInfos();
-        long numberOfAliveBlackPlayers = gameInfos.stream()
-                .filter(x -> Role.isBlack(x.getRole()) && x.getAlive())
-                .count();
-        return numberOfAliveBlackPlayers == 0;
+        return game.getGameInfos().stream().noneMatch(x -> Role.isBlack(x.getRole()) && x.getAlive());
     }
 
     private boolean isGameFinishedByBlack(Game game) {
