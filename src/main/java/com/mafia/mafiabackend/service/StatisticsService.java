@@ -112,8 +112,9 @@ public class StatisticsService {
                             .playerName(player.getName())
                             .totalWins(totalWins)
                             .totalGames((long) gameInfos.size())
-                            .rating(Double.parseDouble(String.format("%.1f",
-                                    gameInfos.size() == 0 ? 0 : Math.pow(totalWins, 2) / gameInfos.size())))
+                            .rating(gameInfos.size() == 0 || totalWins == 0 ?
+                                    0 : Double.parseDouble(String.format("%.1f",
+                                    Math.pow(totalWins, 2) / gameInfos.size())))
                             .build();
                 })
                 .sorted(Comparator.comparing(x -> ((GameRatingDtoResponse) x).getRating()).reversed())
