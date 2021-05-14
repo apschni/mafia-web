@@ -104,7 +104,7 @@ public class StatisticsService {
                     List<GameInfo> gameInfos = player.getGameInfos().stream()
                             .filter(gameInfo -> gameInfo.getGame().getGameFinished())
                             .collect(Collectors.toList());
-                    if (gameInfos.size() < 3) {
+                    if (gameInfos.size() < 2) {
                         return null;
                     }
                     long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
