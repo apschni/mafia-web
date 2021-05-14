@@ -44,13 +44,14 @@ public class GameService {
         if (optionalGame.isPresent()) {
             Game game = optionalGame.get();
             gameStarted = game.getGameStarted();
+            return GameInfoDtoResponse.builder()
+                    .playerInfos(gameInfoDtos)
+                    .gameFinished(game.getGameFinished())
+                    .gameId(id)
+                    .gameStarted(gameStarted)
+                    .build();
         }
-        return GameInfoDtoResponse.builder()
-                .playerInfos(gameInfoDtos)
-                .gameFinished(false)
-                .gameId(id)
-                .gameStarted(gameStarted)
-                .build();
+        return null;
     }
 
     public List<ActiveGamesDtoResponse> getActiveGames() {
