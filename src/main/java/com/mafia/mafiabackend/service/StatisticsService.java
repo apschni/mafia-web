@@ -11,6 +11,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,9 @@ public class StatisticsService {
     }
 
     private Long getWinRate(List<GameInfo> gameInfos) {
-        return (getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos)) / gameInfos.size();
+        double value =
+                (double)(getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos)) / gameInfos.size();
+        return (long) (Double.parseDouble(new DecimalFormat("##.####").format(value)) * 100);
     }
 
     private Long getPointsCount(List<GameInfo> gameInfos) {
@@ -108,9 +111,6 @@ public class StatisticsService {
                         return null;
                     }
                     long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
-                    if (totalWins == 0) {
-                        return null;
-                    }
                     return GameRatingDtoResponse.builder()
                             .playerName(player.getName())
                             .totalWins(totalWins)

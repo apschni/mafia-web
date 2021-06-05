@@ -1,18 +1,21 @@
 package com.mafia.mafiabackend.service;
 
+import com.mafia.mafiabackend.dto.PlayerDtoResponse;
 import com.mafia.mafiabackend.model.Player;
 import com.mafia.mafiabackend.repository.PlayerRepository;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoSession;
+import org.mockito.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.convert.ConversionService;
 import org.testng.annotations.AfterMethod;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class PlayerServiceTest {
@@ -21,31 +24,19 @@ public class PlayerServiceTest {
     private PlayerService playerService;
 
     @Mock
+    private ConversionService conversionService;
+
+    @Mock
     private PlayerRepository playerRepository;
 
     MockitoSession session;
 
-
-    private final List<Player> players = new ArrayList<>();
 
     @Before
     public void init() {
         session = Mockito.mockitoSession()
                 .initMocks(this)
                 .startMocking();
-
-        players.add(Player.builder()
-                .name("test 1")
-                .build());
-        players.add(Player.builder()
-                .name("test 2")
-                .build());
-        players.add(Player.builder()
-                .name("test 3")
-                .build());
-        players.add(Player.builder()
-                .name("test 4")
-                .build());
     }
 
     @AfterMethod
@@ -54,17 +45,49 @@ public class PlayerServiceTest {
     }
 
     @Test
+    void createPlayerAlreadyExistsTest() {
+        when(playerRepository.existsByName(any())).thenReturn(true);
+
+        Long playerId = playerService.addPlayer("Test Name");
+
+        Assertions.assertNull(playerId);
+    }
+
+    @Test
     void createPlayerTest() {
-        /*//mock
+        when(playerRepository.existsByName(any())).thenReturn(false);
         when(playerRepository.save(any())).thenReturn(Player.builder()
                 .id(1L)
-                .name("test name")
+                .name("Test Name")
                 .build());
 
-        //execute
-        long playerId = playerService.addPlayer("test name");
+        Long playerId = playerService.addPlayer("Test Name");
 
-        //assert
-        assertEquals(1L, playerId);*/
+        Assertions.assertEquals(1L, playerId);
     }
+
+
+//    @Test
+//    void getAllPlayersOrderedByTotalGamesPlayedTest(){
+//        when(playerRepository.findAll()).thenReturn(List.of(
+//                new
+//        ))
+//    }
+
+//    @Test
+//    void getPlayerById() {
+//        when(playerRepository.findById(any())).thenReturn(Optional.of(Player.builder()
+//                .id(1L)
+//                .name("Test Name")
+//                .build()));
+//
+//        when(conversionService.convert(any(Player.class), )).
+//
+//        PlayerDtoResponse playerDtoResponse = playerService.getPlayerById(1L);
+//
+//        Assertions.assertEquals(PlayerDtoResponse.builder()
+//                .name("Test Name")
+//                .id(1L)
+//                .build(), playerDtoResponse);
+//    }
 }
