@@ -40,7 +40,7 @@ public class GameService {
             gameInfoDtos.add(conversionService.convert(gameInfo, GameInfoDto.class));
         }
         Optional<Game> optionalGame = gameRepository.findById(id);
-        boolean gameStarted = false;
+        boolean gameStarted;
         if (optionalGame.isPresent()) {
             Game game = optionalGame.get();
             gameStarted = game.getGameStarted();
@@ -66,38 +66,30 @@ public class GameService {
     }
 
     public List<ActiveGamesDtoResponse> getActiveGames() {
-        List<Game> games = gameRepository.findAllByGameFinishedFalse();
-        List<ActiveGamesDtoResponse> activeGamesDtoResponses = new ArrayList<>();
-        games.forEach(game -> {
-            activeGamesDtoResponses.add(ActiveGamesDtoResponse.builder()
-                    .gameId(game.getId())
-                    .playerNames(game.getGameInfos().stream()
-                            .map(GameInfo::getPlayer)
-                            .map(Player::getName)
-                            .collect(Collectors.toList()))
-                    .build());
-        });
-
-        return activeGamesDtoResponses;
+        return gameRepository.findAllByGameFinishedFalse().stream()
+                .map(game -> ActiveGamesDtoResponse.builder()
+                        .gameId(game.getId())
+                        .playerNames(game.getGameInfos().stream()
+                                .map(GameInfo::getPlayer)
+                                .map(Player::getName)
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public List<NonActiveGameDtoResponse> getLastTenNonActiveGames() {
-        List<Game> games = gameRepository.findAllByGameFinishedTrue();
-        List<NonActiveGameDtoResponse> nonActiveGameDtoResponses = new ArrayList<>();
-        games.stream()
+        return gameRepository.findAllByGameFinishedTrue().stream()
                 .sorted(Comparator.comparing(x -> ((Game) x).getMonitoringInfo().getUpdatedAt()).reversed())
                 .limit(10)
-                .forEach(game -> {
-                    nonActiveGameDtoResponses.add(NonActiveGameDtoResponse.builder()
-                            .gameId(game.getId())
-                            .playerNames(game.getGameInfos().stream()
-                                    .map(GameInfo::getPlayer)
-                                    .map(Player::getName)
-                                    .collect(Collectors.toList()))
-                            .winByRed(game.getRedWin())
-                            .build());
-                });
-        return nonActiveGameDtoResponses;
+                .map(game -> NonActiveGameDtoResponse.builder()
+                        .gameId(game.getId())
+                        .playerNames(game.getGameInfos().stream()
+                                .map(GameInfo::getPlayer)
+                                .map(Player::getName)
+                                .collect(Collectors.toList()))
+                        .winByRed(game.getRedWin())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public HttpStatus finishGame(GameFinishDtoRequest gameFinishDtoRequest) {
@@ -140,10 +132,7 @@ public class GameService {
 
         gameRepository.save(game);
 
-        Map<Long, Role> playerIdToRole = new HashMap<>();
-        randomizeRoles(gameDtoRequest.getGameType(),
-                gameDtoRequest.getPlayersIds().size(),
-                playerIdToRole,
+        Map<Long, Role> playerIdToRole = randomizeRoles(gameDtoRequest.getGameType(),
                 new ArrayList<>(gameDtoRequest.getPlayersIds()));
 
 
@@ -178,13 +167,12 @@ public class GameService {
 
 
     public GameInfoDtoResponse reshuffleRoles(Long id, GameType gameType) {
-        List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id);
-        List<Long> playerIds = gameInfos.stream()
-                .map(GameInfo::getPlayerId)
+        List<Long> playerIds = new ArrayList<>();
+        List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id).stream()
+                .peek(gameInfo -> playerIds.add(gameInfo.getPlayerId()))
                 .collect(Collectors.toList());
 
-        Map<Long, Role> playerIdToRole = new HashMap<>();
-        randomizeRoles(gameType, gameInfos.size(), playerIdToRole, playerIds);
+        Map<Long, Role> playerIdToRole = randomizeRoles(gameType, playerIds);
 
         gameInfos.forEach(gameInfo -> {
             Long playerId = gameInfo.getPlayerId();
@@ -193,9 +181,8 @@ public class GameService {
             gameInfo.getMonitoringInfo().setUpdatedAt(Instant.now());
         });
 
-        List<GameInfoDto> gameInfoDtos = gameInfoSaveAndCreateDto(gameInfos);
         return GameInfoDtoResponse.builder()
-                .playerInfos(gameInfoDtos)
+                .playerInfos(gameInfoSaveAndCreateDto(gameInfos))
                 .gameFinished(false)
                 .gameId(id)
                 .gameStarted(false)
@@ -203,17 +190,15 @@ public class GameService {
     }
 
     private List<GameInfoDto> gameInfoSaveAndCreateDto(List<GameInfo> gameInfos) {
-
         return gameInfoRepository.saveAll(gameInfos).stream()
                 .sorted(Comparator.comparing(GameInfo::getSitNumber))
                 .map(gameInfo -> conversionService.convert(gameInfo, GameInfoDto.class))
                 .collect(Collectors.toList());
     }
 
-    private void randomizeRoles(GameType gameType,
-                                Integer numberOfPlayers,
-                                Map<Long, Role> playerIdToRole,
-                                List<Long> playersIds) {
+    private Map<Long, Role> randomizeRoles(GameType gameType, List<Long> playersIds) {
+        Map<Long, Role> playerIdToRole = new HashMap<>();
+        int numberOfPlayers = playersIds.size();
         int counter = 0;
         if (gameType == GameType.KIEV) {
             Long idToRemove = playersIds.get((int) (Math.random() * playersIds.size()));
@@ -243,6 +228,7 @@ public class GameService {
         for (Long id : playersIds) {
             playerIdToRole.put(id, Role.RED);
         }
+        return playerIdToRole;
     }
 
     public void startGame(Long gameId) {

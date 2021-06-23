@@ -11,6 +11,7 @@ import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,8 +53,16 @@ public class StatisticsService {
                 .winRate(getWinRate(gameInfos))
                 .averageFouls(getAverageFouls(gameInfos))
                 .deathCount(getDeathCount(gameInfos))
-                .winsByRed(getWinsByRole(true, gameInfos))
-                .winsByBlack(getWinsByRole(false, gameInfos))
+                .winsByRed(getWinsByRoleType(true, gameInfos))
+                .winsByBlack(getWinsByRoleType(false, gameInfos))
+                .gamesByVillager(getTotalGamesPlayedByRole(Role.RED, gameInfos))
+                .gamesByBlackRole(getTotalGamesPlayedByRole(Role.BLACK, gameInfos))
+                .gamesByDon(getTotalGamesPlayedByRole(Role.DON, gameInfos))
+                .gamesBySheriff(getTotalGamesPlayedByRole(Role.SHERIFF, gameInfos))
+                .winsByVillager(getWinsByRole(Role.RED, gameInfos))
+                .winsByBlackRole(getWinsByRole(Role.BLACK, gameInfos))
+                .winsByDon(getWinsByRole(Role.DON, gameInfos))
+                .winsBySheriff(getWinsByRole(Role.SHERIFF, gameInfos))
                 .totalGames(gameInfos.size())
                 .build();
     }
@@ -66,7 +75,7 @@ public class StatisticsService {
                 .anyMatch(role -> !Role.isBlack(role) == game.getRedWin());
     }
 
-    private Long getWinsByRole(Boolean isRed, List<GameInfo> gameInfos) {
+    private Long getWinsByRoleType(Boolean isRed, List<GameInfo> gameInfos) {
         return isRed ? gameInfos.stream()
                 .filter(gameInfo -> !Role.isBlack(gameInfo.getRole()) && gameInfo.getGame().getRedWin())
                 .count() : gameInfos.stream()
@@ -75,8 +84,28 @@ public class StatisticsService {
 
     }
 
+    private Long getTotalGamesPlayedByRole(Role role, List<GameInfo> gameInfos){
+        return gameInfos.stream()
+                .filter(gameInfo -> gameInfo.getGame().getGameFinished())
+                .filter(gameInfo -> gameInfo.getRole().equals(role))
+                .count();
+    }
+
+    private Long getWinsByRole(Role role, List<GameInfo> gameInfos){
+        return gameInfos.stream()
+                .filter(gameInfo -> gameInfo.getGame().getGameFinished())
+                .filter(gameInfo -> gameInfo.getRole().equals(role))
+                .filter(gameInfo -> (gameInfo.getGame().getRedWin() && !Role.isBlack(role))
+                || (!gameInfo.getGame().getRedWin() && Role.isBlack(role)))
+                .count();
+    }
+
     private Long getWinRate(List<GameInfo> gameInfos) {
-        return (getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos)) / gameInfos.size();
+        double value =
+                (double)(getWinsByRoleType(true, gameInfos) + getWinsByRoleType(false, gameInfos)) / gameInfos.size();
+
+        return (long) (Double.parseDouble(String.format("%.1f",
+                value).replaceAll(",", ".")) * 100);
     }
 
     private Long getPointsCount(List<GameInfo> gameInfos) {
@@ -107,10 +136,7 @@ public class StatisticsService {
                     if (gameInfos.size() < 2) {
                         return null;
                     }
-                    long totalWins = getWinsByRole(true, gameInfos) + getWinsByRole(false, gameInfos);
-                    if (totalWins == 0) {
-                        return null;
-                    }
+                    long totalWins = getWinsByRoleType(true, gameInfos) + getWinsByRoleType(false, gameInfos);
                     return GameRatingDtoResponse.builder()
                             .playerName(player.getName())
                             .totalWins(totalWins)
