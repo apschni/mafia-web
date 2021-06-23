@@ -1,6 +1,5 @@
 package com.mafia.mafiabackend.service;
 
-import com.mafia.mafiabackend.converter.PlayerToPlayerDtoResponseConverter;
 import com.mafia.mafiabackend.dto.PlayerDtoResponse;
 import com.mafia.mafiabackend.model.Game;
 import com.mafia.mafiabackend.model.GameInfo;
@@ -22,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
