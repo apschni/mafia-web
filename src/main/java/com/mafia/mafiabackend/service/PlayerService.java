@@ -6,6 +6,7 @@ import com.mafia.mafiabackend.model.MonitoringInfo;
 import com.mafia.mafiabackend.model.Player;
 import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;

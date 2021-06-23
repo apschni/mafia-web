@@ -198,6 +198,7 @@ public class GameService {
 
     private Map<Long, Role> randomizeRoles(GameType gameType, List<Long> playersIds) {
         Map<Long, Role> playerIdToRole = new HashMap<>();
+        int numberOfPlayers = playersIds.size();
         int counter = 0;
         if (gameType == GameType.KIEV) {
             Long idToRemove = playersIds.get((int) (Math.random() * playersIds.size()));
@@ -218,7 +219,7 @@ public class GameService {
         playerIdToRole.put(idToRemove, Role.DON);
         playersIds.remove(idToRemove);
         counter++;
-        while (counter < playersIds.size() / 3) {
+        while (counter < numberOfPlayers / 3) {
             idToRemove = playersIds.get((int) (Math.random() * playersIds.size()));
             playerIdToRole.put(idToRemove, Role.BLACK);
             playersIds.remove(idToRemove);

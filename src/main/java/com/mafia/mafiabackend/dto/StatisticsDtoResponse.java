@@ -34,6 +34,22 @@ public class StatisticsDtoResponse {
     @Schema(description = "Кол-во побед игрока за красных")
     private Long winsByRed;
 
+    private Long winsByVillager;
+
+    private Long winsByBlackRole;
+
+    private Long winsByDon;
+
+    private Long winsBySheriff;
+
+    private Long gamesByVillager;
+
+    private Long gamesByBlackRole;
+
+    private Long gamesByDon;
+
+    private Long gamesBySheriff;
+
     @Schema(description = "Общее кол-во игр, сыгранных игроком")
     private Integer totalGames;
 }
