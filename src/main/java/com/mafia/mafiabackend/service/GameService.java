@@ -231,12 +231,14 @@ public class GameService {
         return playerIdToRole;
     }
 
-    public void startGame(Long gameId) {
+    public HttpStatus startGame(Long gameId) {
         Optional<Game> optionalGame = gameRepository.findById(gameId);
         if (optionalGame.isPresent()) {
             Game game = optionalGame.get();
             game.setGameStarted(true);
             gameRepository.save(game);
+            return HttpStatus.OK;
         }
+        return HttpStatus.NOT_FOUND;
     }
 }

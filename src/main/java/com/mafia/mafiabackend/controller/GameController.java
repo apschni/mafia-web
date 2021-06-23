@@ -66,8 +66,7 @@ public class GameController {
     )
     @PostMapping("/game/{id}/start")
     public HttpStatus startGame(@PathVariable("id") @GameExists Long gameId) {
-        gameService.startGame(gameId);
-        return HttpStatus.OK;
+        return gameService.startGame(gameId);
     }
 
 }
