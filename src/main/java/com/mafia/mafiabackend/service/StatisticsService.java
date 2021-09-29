@@ -168,8 +168,7 @@ public class StatisticsService {
         double value =
                 (double) (getWinsByRoleType(true, gameInfos) + getWinsByRoleType(false, gameInfos)) / gameInfos.size();
 
-        return (long) (Double.parseDouble(String.format("%.1f",
-                value).replaceAll(",", ".")) * 100);
+        return Math.round(value * 100);
     }
 
     private Long getPointsCount(List<GameInfo> gameInfos) {
