@@ -136,7 +136,7 @@ public class StatisticsService {
         return game.getGameInfos().stream()
                 .filter(gameInfo -> gameInfo.getPlayerId().equals(playerId))
                 .map(GameInfo::getRole)
-                .anyMatch(role -> !Role.isBlack(role) == game.getRedWin());
+                .anyMatch(role -> !Role.isBlack(role).equals(game.getRedWin()));
     }
 
     private Long getWinsByRoleType(Boolean isRed, List<GameInfo> gameInfos) {
