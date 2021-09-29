@@ -1,15 +1,13 @@
 package com.mafia.mafiabackend.controller;
 
-import com.mafia.mafiabackend.dto.GameRatingDtoResponse;
-import com.mafia.mafiabackend.dto.PlayerDtoRequest;
-import com.mafia.mafiabackend.dto.PlayerDtoResponse;
-import com.mafia.mafiabackend.dto.StatisticsDtoResponse;
+import com.mafia.mafiabackend.dto.*;
 import com.mafia.mafiabackend.service.PlayerService;
 import com.mafia.mafiabackend.service.StatisticsService;
 import com.mafia.mafiabackend.validation.PlayerExists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,6 +41,22 @@ public class PlayerController {
         return statisticsService.getPlayersRating();
     }
 
+
+    @Operation(
+            summary = "Соотношение процента побед за красных и чёрных"
+    )
+    @GetMapping("/player/common-statistics")
+    public ResponseEntity<CommonWinsDtoResponse> getWinsCount(){
+        return statisticsService.getCommonStatist();
+    }
+
+    @Operation(
+            summary = "пдейт базы для добавления общей статистики по уже прошедшим играм"
+    )
+    @PostMapping("/player/statistics/update-with-past-games")
+    public void updateWithPastGames(){
+        statisticsService.updateCommonStatisticWithPastGames();
+    }
 
     @Operation(
             summary = "Получение списка всех игроков"

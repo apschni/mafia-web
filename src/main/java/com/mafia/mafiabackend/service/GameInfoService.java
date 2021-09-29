@@ -18,6 +18,7 @@ import java.util.List;
 public class GameInfoService {
     private final GameInfoRepository gameInfoRepository;
     private final GameService gameService;
+    private final StatisticsService statisticsService;
 
     public GameResult updateGameInfo(GameInfoDtoRequest gameInfoDtoRequest) {
         GameInfo gameInfo = gameInfoRepository.findByPlayerIdAndGameId(
@@ -45,6 +46,7 @@ public class GameInfoService {
                     .id(game.getId())
                     .result(GameResult.BLACK_WIN)
                     .build());
+            statisticsService.updateCommonStatistics(Role.BLACK);
             return GameResult.BLACK_WIN;
         }
         if (gameFinishedByRed) {
@@ -52,6 +54,7 @@ public class GameInfoService {
                     .id(game.getId())
                     .result(GameResult.RED_WIN)
                     .build());
+            statisticsService.updateCommonStatistics(Role.RED);
             return GameResult.RED_WIN;
         }
         return GameResult.GAME_IN_PROGRESS;

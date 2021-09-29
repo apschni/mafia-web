@@ -1,14 +1,17 @@
 package com.mafia.mafiabackend.service;
 
+import com.mafia.mafiabackend.dto.CommonWinsDtoResponse;
 import com.mafia.mafiabackend.dto.GameDtoResponse;
 import com.mafia.mafiabackend.dto.GameRatingDtoResponse;
 import com.mafia.mafiabackend.dto.StatisticsDtoResponse;
-import com.mafia.mafiabackend.model.Game;
-import com.mafia.mafiabackend.model.GameInfo;
-import com.mafia.mafiabackend.model.Player;
-import com.mafia.mafiabackend.model.Role;
+import com.mafia.mafiabackend.model.*;
+import com.mafia.mafiabackend.repository.CommonStatisticsRepository;
+import com.mafia.mafiabackend.repository.GameInfoRepository;
 import com.mafia.mafiabackend.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class StatisticsService {
     private final PlayerRepository playerRepository;
+    private final GameInfoRepository gameInfoRepository;
+    private final CommonStatisticsRepository commonStatisticsRepository;
 
     public StatisticsDtoResponse getStatisticsByPlayerId(Long id) {
         Player player = playerRepository.findById(id).orElse(null);
@@ -66,6 +71,66 @@ public class StatisticsService {
                 .build();
     }
 
+    public void updateCommonStatisticWithPastGames(){
+        List<GameInfo> gameInfos = gameInfoRepository.findAll();
+        int totalRedWins = (int) gameInfos.stream()
+                .map(GameInfo::getGame)
+                .distinct()
+                .filter(Game::getRedWin)
+                .count();
+
+        int totalGames = (int) gameInfos.stream()
+                .map(GameInfo::getGame)
+                .distinct()
+                .count();
+        commonStatisticsRepository.save(CommonStatistic.builder()
+                .totalGames(totalGames)
+                .totalRedWins(totalRedWins)
+                .build());
+    }
+
+    public void updateCommonStatistics(Role role) {
+        List<CommonStatistic> commonStatisticList = commonStatisticsRepository.findAll();
+        CommonStatistic commonStatistic;
+        if (commonStatisticList.size() != 0){
+            commonStatistic = commonStatisticList.get(0);
+        }
+        else {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!Role.isBlack(role)) {
+            commonStatisticsRepository.save(CommonStatistic.builder()
+                    .id(commonStatistic.getId())
+                    .totalRedWins(commonStatistic.getTotalRedWins() + 1)
+                    .totalGames(commonStatistic.getTotalGames() + 1)
+                    .build());
+        }
+        else {
+            commonStatisticsRepository.save(CommonStatistic.builder()
+                    .id(commonStatistic.getId())
+                    .totalRedWins(commonStatistic.getTotalRedWins())
+                    .totalGames(commonStatistic.getTotalGames() + 1)
+                    .build());
+        }
+    }
+
+    public ResponseEntity<CommonWinsDtoResponse> getCommonStatist(){
+        List<CommonStatistic> commonStatisticList = commonStatisticsRepository.findAll();
+        CommonStatistic commonStatistic;
+        if (commonStatisticList.size() != 0){
+            commonStatistic = commonStatisticList.get(0);
+        }
+        else {
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(CommonWinsDtoResponse.builder()
+                .winsByRed(commonStatistic.getTotalRedWins())
+                .winsByBlack(commonStatistic.getTotalGames() - commonStatistic.getTotalRedWins())
+                .totalGames(commonStatistic.getTotalGames())
+                .build(), HttpStatus.OK);
+    }
+
 
     private Boolean isPlayerWon(Game game, Long playerId) {
         return game.getGameInfos().stream()
@@ -83,25 +148,25 @@ public class StatisticsService {
 
     }
 
-    private Long getTotalGamesPlayedByRole(Role role, List<GameInfo> gameInfos){
+    private Long getTotalGamesPlayedByRole(Role role, List<GameInfo> gameInfos) {
         return gameInfos.stream()
                 .filter(gameInfo -> gameInfo.getGame().getGameFinished())
                 .filter(gameInfo -> gameInfo.getRole().equals(role))
                 .count();
     }
 
-    private Long getWinsByRole(Role role, List<GameInfo> gameInfos){
+    private Long getWinsByRole(Role role, List<GameInfo> gameInfos) {
         return gameInfos.stream()
                 .filter(gameInfo -> gameInfo.getGame().getGameFinished())
                 .filter(gameInfo -> gameInfo.getRole().equals(role))
                 .filter(gameInfo -> (gameInfo.getGame().getRedWin() && !Role.isBlack(role))
-                || (!gameInfo.getGame().getRedWin() && Role.isBlack(role)))
+                        || (!gameInfo.getGame().getRedWin() && Role.isBlack(role)))
                 .count();
     }
 
     private Long getWinRate(List<GameInfo> gameInfos) {
         double value =
-                (double)(getWinsByRoleType(true, gameInfos) + getWinsByRoleType(false, gameInfos)) / gameInfos.size();
+                (double) (getWinsByRoleType(true, gameInfos) + getWinsByRoleType(false, gameInfos)) / gameInfos.size();
 
         return (long) (Double.parseDouble(String.format("%.1f",
                 value).replaceAll(",", ".")) * 100);

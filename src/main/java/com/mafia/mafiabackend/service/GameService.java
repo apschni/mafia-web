@@ -25,6 +25,7 @@ public class GameService {
     private final GameInfoRepository gameInfoRepository;
     private final PlayerRepository playerRepository;
     private final ConversionService conversionService;
+    private final StatisticsService statisticsService;
 
     public GameInfoDtoResponse getGameInfosByGameId(Long id) {
         List<GameInfo> gameInfos = gameInfoRepository.findAllByGameId(id).stream()
@@ -114,6 +115,7 @@ public class GameService {
         game.setGameFinished(true);
         game.getMonitoringInfo().setUpdatedAt(Instant.now());
         gameRepository.save(game);
+        statisticsService.updateCommonStatistics(game.getRedWin() ? Role.RED : Role.BLACK);
         log.info("Game with id: " + gameFinishDtoRequest.getId() + " has been finished");
         return HttpStatus.OK;
     }
